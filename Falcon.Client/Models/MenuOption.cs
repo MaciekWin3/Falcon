@@ -3,6 +3,7 @@
     public enum MenuOption
     {
         JoinChat = 1,
-        Exit
+        Help = 2,
+        Exit = 3
     }
 }

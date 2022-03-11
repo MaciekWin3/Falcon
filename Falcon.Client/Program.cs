@@ -16,12 +16,30 @@ var connection = new HubConnectionBuilder()
     .Build();
 
 connection.StartAsync().Wait();
-connection.InvokeCoreAsync("SendMessage", args: new[] { "Maciek", "Hello" });
 connection.On("ReceiveMessage", (string userName, string message) =>
 {
-    AnsiConsole.Markup($"[blue]{userName}[/]: [green]{message}[/]");
-    //Console.WriteLine(userName + ": " + message);
+    AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]");
 });
+
+
+while (true)
+{
+    var message = WriteOnBottomLine();
+    connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
+    message = string.Empty;
+}
+
+static string WriteOnBottomLine()
+{
+    int x = Console.CursorLeft;
+    int y = Console.CursorTop;
+    Console.CursorTop = Console.WindowTop + Console.WindowHeight - 1;
+    var message = Console.ReadLine();
+    Console.WriteLine(message);
+    // Restore previous position
+    Console.SetCursorPosition(x, y);
+    return message;
+}
 
 Console.WriteLine("Done");
 

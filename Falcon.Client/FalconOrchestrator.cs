@@ -13,7 +13,6 @@ namespace Falcon.Client
                 .LeftAligned()
                 .Color(Color.Aqua));
 
-            // Ask for the user's favorite fruit
             var option = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
                     .Title("[aqua]Menu[/]")
@@ -21,11 +20,15 @@ namespace Falcon.Client
                     .MoreChoicesText("[grey](Nauraaaa)[/]")
                     .AddChoices(new[] {
                         "1. Join chat",
-                        "2. Quit"
+                        "2. Help",
+                        "3. Quit"
                     }));
 
             var choice = ParseMenuChoice(option);
-
+            if (choice != MenuOption.Exit)
+            {
+                AnsiConsole.Clear();
+            }
             Run(choice);
         }
 
@@ -43,17 +46,35 @@ namespace Falcon.Client
                 case MenuOption.Exit:
                     Exit();
                     break;
+                case MenuOption.Help:
+                    DisplayManual();
+                    break;
                 default:
                     Exit();
                     break;
             }
         }
 
-        private void JoinChat()
+        private void DisplayManual()
+        {
+            var rule = new Rule("[red]Hello[/]");
+            AnsiConsole.Write(rule);
+            AnsiConsole.MarkupLine("[magenta]Manual[/]");
+            AnsiConsole.MarkupLine("[magenta]Press q to exit[/]");
+            var x = Console.ReadKey();
+            if (x.KeyChar == 'q')
+            {
+                Console.Clear();
+                //AnsiConsole.Clear();
+                DisplayMenu();
+            }
+        }
+
+        private static void JoinChat()
         {
             AnsiConsole.Markup("[magenta]Joined chat[/]");
         }
-        private void Exit()
+        private static void Exit()
         {
             AnsiConsole.Markup("[red]Exiting...[/]");
             Environment.Exit(1);

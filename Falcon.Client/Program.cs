@@ -1,9 +1,9 @@
 ﻿using Falcon.Client;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
 var falconOrchestrator = new FalconOrchestrator();
+var chat = new Chat();
 falconOrchestrator.DisplayMenu();
 
 var connection = new HubConnectionBuilder()
@@ -16,31 +16,18 @@ var connection = new HubConnectionBuilder()
     .Build();
 
 connection.StartAsync().Wait();
-connection.On("ReceiveMessage", (string userName, string message) =>
-{
-    AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]");
-});
+//connection.On("ReceiveMessage", (string userName, string message) =>
+//{
+//    AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]");
+//});
 
+chat.Run();
 
-while (true)
-{
-    var message = WriteOnBottomLine();
-    connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
-    message = string.Empty;
-}
-
-static string WriteOnBottomLine()
-{
-    int x = Console.CursorLeft;
-    int y = Console.CursorTop;
-    Console.CursorTop = Console.WindowTop + Console.WindowHeight - 1;
-    var message = Console.ReadLine();
-    Console.WriteLine(message);
-    // Restore previous position
-    Console.SetCursorPosition(x, y);
-    return message;
-}
-
-Console.WriteLine("Done");
-
-Console.ReadKey();
+//while (true)
+//{
+//    Console.SetCursorPosition(0, Console.WindowTop + Console.WindowHeight - 1);
+//    Console.Write("Your message: ");
+//    var message = Console.ReadLine();
+//    connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
+//    message = string.Empty;
+//}

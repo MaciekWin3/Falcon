@@ -17,7 +17,6 @@ namespace Falcon.Client
                 new SelectionPrompt<string>()
                     .Title("[aqua]Menu[/]")
                     .PageSize(10)
-                    .MoreChoicesText("[grey](Nauraaaa)[/]")
                     .AddChoices(new[] {
                         "1. Join chat",
                         "2. Help",
@@ -36,6 +35,7 @@ namespace Falcon.Client
         {
             return (MenuOption)int.Parse(option[0].ToString());
         }
+
         private void Run(MenuOption choice)
         {
             switch (choice)
@@ -43,12 +43,15 @@ namespace Falcon.Client
                 case MenuOption.JoinChat:
                     JoinChat();
                     break;
+
                 case MenuOption.Exit:
                     Exit();
                     break;
+
                 case MenuOption.Help:
                     DisplayManual();
                     break;
+
                 default:
                     Exit();
                     break;
@@ -65,7 +68,6 @@ namespace Falcon.Client
             if (x.KeyChar == 'q')
             {
                 Console.Clear();
-                //AnsiConsole.Clear();
                 DisplayMenu();
             }
         }
@@ -74,6 +76,7 @@ namespace Falcon.Client
         {
             AnsiConsole.Markup("[magenta]Joined chat[/]");
         }
+
         private static void Exit()
         {
             AnsiConsole.Markup("[red]Exiting...[/]");

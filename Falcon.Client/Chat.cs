@@ -27,7 +27,9 @@ namespace Falcon.Client
                 {
                     Console.CursorVisible = false;
                     Console.SetCursorPosition(0, windowHeight - 1);
-                    AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]");
+                    AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]"); // Change for deafult console
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    Console.Write("Message: ");
                     Console.CursorVisible = true;
                 }
             });
@@ -38,18 +40,29 @@ namespace Falcon.Client
                 lock (bufferLock)
                 {
                     Console.SetCursorPosition(0, windowHeight - 1);
-                    Console.Write("Command: ");
+                    Console.Write("Message: ");
                     Console.CursorVisible = true;
                 }
 
                 message = Console.ReadLine();
-
-                lock (bufferLock)
+                if (message is not null || message![0] != '/')
                 {
-                    connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
-                    Console.CursorVisible = false;
+                    lock (bufferLock)
+                    {
+                        connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
+                        Console.CursorVisible = false;
+                    }
                 }
-            } while (!string.Equals(message, "quit", StringComparison.OrdinalIgnoreCase));
+                else
+                {
+                    ExecuteCommand();
+                }
+            } while (!string.Equals(message, "quit()", StringComparison.OrdinalIgnoreCase));
+        }
+
+        public void ExecuteCommand()
+        {
+            throw new NotImplementedException();
         }
     }
 }

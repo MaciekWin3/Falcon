@@ -1,7 +1,12 @@
 using Falcon.Server;
+using Falcon.Server.Features.Auth.Models;
 using Falcon.Server.Hubs;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +14,33 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.AddControllers();
+builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddDbContext<FalconDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("FalconDb"));
+});
+
+// Auth - checkParameters
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+        .AddEntityFrameworkStores<FalconDbContext>()
+        .AddDefaultTokenProviders();
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(builder.Configuration["Jwt:Key"])),
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 builder.Services.AddSwaggerGen(options =>
 {
     var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
@@ -43,11 +75,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.AddSignalRSwaggerGen();
-});
-
-builder.Services.AddDbContext<FalconDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FalconDb"));
 });
 
 // Auth

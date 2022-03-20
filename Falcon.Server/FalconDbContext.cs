@@ -1,11 +1,19 @@
-﻿using Falcon.Server.Models;
+﻿using Falcon.Server.Features.Auth.Models;
+using Falcon.Server.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Falcon.Server
 {
-    public class FalconDbContext : IdentityDbContext
+    public class FalconDbContext : IdentityDbContext<ApplicationUser>
     {
+        public FalconDbContext(DbContextOptions<FalconDbContext> options) : base(options)
+        {
+        }
+
+        public override DbSet<ApplicationUser> Users { get; set; }
+        public DbSet<Message> Messages { get; set; }
+
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
             ShadowPropertiesSetup();
@@ -49,6 +57,19 @@ namespace Falcon.Server
             });
 
             base.OnModelCreating(modelBuilder);
+            BuildModelForApplicationUsers(modelBuilder);
+            BuildModelForMessages(modelBuilder);
+        }
+
+        private static void BuildModelForApplicationUsers(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ApplicationUser>()
+                .ToTable("Users")
+                .HasKey(u => u.Id);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.Messages)
+                .WithOne(m => m.User);
         }
 
         private static void BuildModelForMessages(ModelBuilder modelBuilder)
@@ -56,6 +77,10 @@ namespace Falcon.Server
             modelBuilder.Entity<Message>()
                 .ToTable("Messages")
                 .HasKey(m => new { m.Id });
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.User)
+                .WithMany(u => u.Messages);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Falcon.Server.Features.Auth
+namespace Falcon.Server.Features.Auth.Models
 {
     public class UserToken
     {

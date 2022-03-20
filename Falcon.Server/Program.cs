@@ -16,6 +16,12 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 
+// Repositories
+//builder.Services.AddTransient<>
+
+// Services
+
+// Database
 builder.Services.AddDbContext<FalconDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("FalconDb"));
@@ -41,6 +47,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Swagger
 builder.Services.AddSwaggerGen(options =>
 {
     var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
@@ -77,7 +84,6 @@ builder.Services.AddSwaggerGen(options =>
     options.AddSignalRSwaggerGen();
 });
 
-// Auth
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())

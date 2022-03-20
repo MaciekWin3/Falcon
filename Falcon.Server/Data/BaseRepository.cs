@@ -2,12 +2,11 @@
 {
     public abstract class BaseRepository
     {
-        private readonly IConfiguration configuration;
-        protected string ConnectionString { get; set; }
+        protected readonly FalconDbContext context;
 
-        protected BaseRepository(IConfiguration configuration)
+        protected BaseRepository(FalconDbContext context)
         {
-            this.configuration = configuration;
+            this.context = context;
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Falcon.Server.Models;
+﻿using Falcon.Server.Features.Messages.Models;
 using Microsoft.AspNetCore.Identity;
 
 namespace Falcon.Server.Features.Auth.Models

@@ -1,14 +1,14 @@
-﻿using Falcon.Server.Features.Messages.Repositories;
-using Falcon.Server.Models;
+﻿using Falcon.Server.Features.Messages.Models;
+using Falcon.Server.Features.Messages.Repositories;
 using Falcon.Server.Utils;
 
 namespace Falcon.Server.Features.Messages.Services
 {
-    public class MessageService
+    public class MessageService : IMessageService
     {
-        private readonly MessageRepository messageRepository;
+        private readonly IMessageRepository messageRepository;
 
-        public MessageService(MessageRepository messageRepository)
+        public MessageService(IMessageRepository messageRepository)
         {
             this.messageRepository = messageRepository;
         }

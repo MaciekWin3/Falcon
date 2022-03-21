@@ -1,9 +1,9 @@
-﻿using Falcon.Server.Models;
+﻿using Falcon.Server.Features.Messages.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Falcon.Server.Features.Messages.Repositories
 {
-    public class MessageRepository : BaseRepository
+    public class MessageRepository : BaseRepository, IMessageRepository
     {
         public MessageRepository(FalconDbContext context) : base(context)
         {

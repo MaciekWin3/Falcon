@@ -1,5 +1,5 @@
 ﻿using Falcon.Server.Features.Auth.Models;
-using Falcon.Server.Models;
+using Falcon.Server.Features.Messages.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Falcon.Server.Features.Messages.Models;
+using Falcon.Server.Features.Messages.Services;
+using Microsoft.AspNetCore.SignalR;
 
 namespace Falcon.Server.Hubs
 {
     public class ChatHub : Hub
     {
         private readonly string _botUser;
+        private readonly IMessageService messageService;
 
-        public ChatHub()
+        public ChatHub(IMessageService messageService)
         {
             _botUser = "MyChat Bot";
+            this.messageService = messageService;
         }
 
         public override Task OnConnectedAsync()
@@ -27,6 +31,7 @@ namespace Falcon.Server.Hubs
         public async Task SendMessageAsync(string userName, string message)
         {
             await Clients.Others.SendAsync("ReceiveMessage", userName, message);
+            await messageService.CreateAsync(new Message { Content = message });
         }
     }
 }

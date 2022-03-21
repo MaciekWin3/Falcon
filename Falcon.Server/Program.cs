@@ -1,5 +1,7 @@
 using Falcon.Server;
 using Falcon.Server.Features.Auth.Models;
+using Falcon.Server.Features.Messages.Repositories;
+using Falcon.Server.Features.Messages.Services;
 using Falcon.Server.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -15,11 +17,7 @@ builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
-
-// Repositories
-//builder.Services.AddTransient<>
-
-// Services
+builder.Services.AddHttpClient();
 
 // Database
 builder.Services.AddDbContext<FalconDbContext>(options =>
@@ -46,6 +44,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+
+// Repositories
+builder.Services.AddTransient<IMessageRepository, MessageRepository>();
+
+// Services
+builder.Services.AddTransient<IMessageService, MessageService>();
 
 // Swagger
 builder.Services.AddSwaggerGen(options =>

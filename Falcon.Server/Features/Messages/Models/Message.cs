@@ -1,6 +1,6 @@
 ﻿using Falcon.Server.Features.Auth.Models;
 
-namespace Falcon.Server.Models
+namespace Falcon.Server.Features.Messages.Models
 {
     public class Message
     {

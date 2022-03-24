@@ -1,9 +1,11 @@
 ﻿using Falcon.Server.Features.Messages.Models;
 using Falcon.Server.Features.Messages.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Falcon.Server.Hubs
 {
+    [Authorize()]
     public class ChatHub : Hub
     {
         private readonly string _botUser;

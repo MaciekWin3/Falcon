@@ -1,11 +1,12 @@
 ﻿using Falcon.Server.Features.Messages.Models;
 using Falcon.Server.Features.Messages.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Falcon.Server.Hubs
 {
-    [Authorize()]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatHub : Hub
     {
         private readonly string _botUser;

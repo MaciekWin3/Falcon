@@ -1,11 +1,18 @@
 ﻿using Falcon.Client.Models;
 using Spectre.Console;
 
-namespace Falcon.Client
+namespace Falcon.Client.Services
 {
-    public class FalconOrchestrator
+    public class FalconOrchestratorService : IFalconOrchestratorService
     {
-        public void DisplayMenu()
+        private readonly IChatService chatService;
+
+        public FalconOrchestratorService(IChatService chatService)
+        {
+            this.chatService = chatService;
+        }
+
+        public async Task DisplayMenu()
         {
             AnsiConsole.Clear();
             AnsiConsole.Write(
@@ -28,7 +35,7 @@ namespace Falcon.Client
             {
                 AnsiConsole.Clear();
             }
-            Run(choice);
+            await RunAsync(choice);
         }
 
         private MenuOption ParseMenuChoice(string option)
@@ -36,12 +43,12 @@ namespace Falcon.Client
             return (MenuOption)int.Parse(option[0].ToString());
         }
 
-        private void Run(MenuOption choice)
+        private async Task RunAsync(MenuOption choice)
         {
             switch (choice)
             {
                 case MenuOption.JoinChat:
-                    JoinChat();
+                    await JoinChat();
                     break;
 
                 case MenuOption.Exit:
@@ -49,7 +56,7 @@ namespace Falcon.Client
                     break;
 
                 case MenuOption.Help:
-                    DisplayManual();
+                    await DisplayManual();
                     break;
 
                 default:
@@ -58,7 +65,7 @@ namespace Falcon.Client
             }
         }
 
-        private void DisplayManual()
+        private async Task DisplayManual()
         {
             var rule = new Rule("[red]Hello[/]");
             AnsiConsole.Write(rule);
@@ -68,16 +75,16 @@ namespace Falcon.Client
             if (x.KeyChar == 'q')
             {
                 Console.Clear();
-                DisplayMenu();
+                await DisplayMenu();
             }
         }
 
-        private static void JoinChat()
+        private async Task JoinChat()
         {
-            AnsiConsole.Markup("[magenta]Joined chat[/]");
+            await chatService.RunAsync();
         }
 
-        private static void Exit()
+        private void Exit()
         {
             AnsiConsole.Markup("[red]Exiting...[/]");
             Environment.Exit(1);

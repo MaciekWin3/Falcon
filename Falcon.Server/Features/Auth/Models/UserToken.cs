@@ -16,8 +16,8 @@ namespace Falcon.Server.Features.Auth.Models
             {
                 new Claim(JwtRegisteredClaimNames.UniqueName, email),
                 new Claim(ClaimTypes.Name, email),
-                new Claim("value", "coinbook"),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim("value", "falcon"),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configurationKey));

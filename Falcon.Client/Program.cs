@@ -1,34 +1,48 @@
-﻿using Falcon.Client;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Falcon.Client.Services;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
-var falconOrchestrator = new FalconOrchestrator();
-var chat = new Chat();
-falconOrchestrator.DisplayMenu();
-
-var connection = new HubConnectionBuilder()
-    .WithUrl("https://localhost:7262/chathub")
-    .ConfigureLogging(configureLogging =>
+namespace Falcon.Client
+{
+    internal class Program
     {
-        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
-        configureLogging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
-    })
-    .Build();
+        private static async Task Main(string[] args)
+        {
+            var builder = new ConfigurationBuilder();
+            BuildConfig(builder);
 
-connection.StartAsync().Wait();
-connection.On("ReceiveMessage", (string userName, string message) =>
-{
-    AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]");
-});
+            // Disable logging
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) =>
+                {
+                    services.AddTransient<IAuthService, AuthService>();
+                    services.AddTransient<IChatService, ChatService>();
+                    services.AddTransient<IFalconOrchestratorService, FalconOrchestratorService>();
+                    services.AddHttpClient();
+                    services.AddLogging(builder =>
+                        {
+                            builder
+                                .AddFilter("Microsoft", LogLevel.Warning)
+                                .AddFilter("System", LogLevel.Warning)
+                                .AddFilter("NToastNotify", LogLevel.Warning)
+                                .AddConsole();
+                        }
+                    );
+                })
+                .Build();
 
-chat.Run();
+            var svc = ActivatorUtilities.CreateInstance<FalconOrchestratorService>(host.Services);
+            await svc.DisplayMenu();
+        }
 
-while (true)
-{
-    Console.SetCursorPosition(0, Console.WindowTop + Console.WindowHeight - 1);
-    Console.Write("Your message: ");
-    var message = Console.ReadLine();
-    connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
-    message = string.Empty;
+        private static void BuildConfig(IConfigurationBuilder builder)
+        {
+            builder.SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json")
+                .AddEnvironmentVariables();
+        }
+    }
 }

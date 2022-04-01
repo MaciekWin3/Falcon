@@ -11,11 +11,13 @@ namespace Falcon.Server.Hubs
     {
         private readonly string _botUser;
         private readonly IMessageService messageService;
+        private readonly IUserIdProvider userIdProvider;
 
-        public ChatHub(IMessageService messageService)
+        public ChatHub(IMessageService messageService, IUserIdProvider userIdProvider)
         {
             _botUser = "MyChat Bot";
             this.messageService = messageService;
+            this.userIdProvider = userIdProvider;
         }
 
         public override Task OnConnectedAsync()
@@ -33,7 +35,9 @@ namespace Falcon.Server.Hubs
 
         public async Task SendMessageAsync(string userName, string message)
         {
-            await Clients.Others.SendAsync("ReceiveMessage", userName, message);
+            // Need some changes
+            var user = Context.User.Identities.FirstOrDefault().Claims.FirstOrDefault().Value;
+            await Clients.Others.SendAsync("ReceiveMessage", user, message);
             await messageService.CreateAsync(new Message { Content = message });
         }
     }

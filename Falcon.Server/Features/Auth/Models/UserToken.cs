@@ -18,6 +18,8 @@ namespace Falcon.Server.Features.Auth.Models
                 new Claim(ClaimTypes.Name, email),
                 new Claim("value", "falcon"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                // Change email for username
+                new Claim(ClaimTypes.NameIdentifier, email[..email.IndexOf('@')])
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configurationKey));

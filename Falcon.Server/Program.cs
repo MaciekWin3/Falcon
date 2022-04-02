@@ -1,12 +1,10 @@
 using Falcon.Server;
-using Falcon.Server.Features.Auth;
 using Falcon.Server.Features.Auth.Models;
 using Falcon.Server.Features.Messages.Repositories;
 using Falcon.Server.Features.Messages.Services;
 using Falcon.Server.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -63,8 +61,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             }
         };
     });
-
-builder.Services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
 
 // Repositories
 builder.Services.AddTransient<IMessageRepository, MessageRepository>();

@@ -10,6 +10,12 @@ namespace Falcon.Client.Services
         private static int windowHeight = Console.BufferHeight;
         private readonly IAuthService authService;
 
+        private List<string> Commands = new()
+        {
+            "/quit",
+            "/active"
+        };
+
         public ChatService(IAuthService authService)
         {
             this.authService = authService;
@@ -17,8 +23,8 @@ namespace Falcon.Client.Services
 
         public async Task RunAsync()
         {
+            Console.Clear(); //Check it
             string token = await authService.Login();
-            //bool isAuthorized = true;
             if (token.Length != 0)
             {
                 var connection = new HubConnectionBuilder()
@@ -28,6 +34,7 @@ namespace Falcon.Client.Services
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
                        configureLogging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
                    })
+                   .WithAutomaticReconnect() // Handle it
                    .Build();
 
                 connection.StartAsync().Wait();
@@ -63,11 +70,11 @@ namespace Falcon.Client.Services
                             Console.CursorVisible = false;
                         }
                     }
-                    else
+                    if (message[0] == '/' && Commands.Contains(message))
                     {
                         ExecuteCommand();
                     }
-                } while (!string.Equals(message, "quit()", StringComparison.OrdinalIgnoreCase));
+                } while (!string.Equals(message, "/quit", StringComparison.OrdinalIgnoreCase));
             }
             else
             {

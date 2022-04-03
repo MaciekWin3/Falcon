@@ -10,10 +10,11 @@ namespace Falcon.Client.Services
         private static int windowHeight = Console.BufferHeight;
         private readonly IAuthService authService;
 
-        private List<string> Commands = new()
+        private readonly List<string> Commands = new()
         {
             "/quit",
-            "/active"
+            "/active",
+            "/chart"
         };
 
         public ChatService(IAuthService authService)
@@ -23,8 +24,8 @@ namespace Falcon.Client.Services
 
         public async Task RunAsync()
         {
-            Console.Clear(); //Check it
             string token = await authService.Login();
+            Console.Clear(); // Check it
             if (token.Length != 0)
             {
                 var connection = new HubConnectionBuilder()
@@ -42,16 +43,27 @@ namespace Falcon.Client.Services
                 {
                     lock (bufferLock)
                     {
+                        // Need changes
                         Console.CursorVisible = false;
                         Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.MarkupLine($"[blue]{userName}[/]: [green]{message}[/]"); // Change for deafult console
+                        try
+                        {
+                            AnsiConsole.MarkupLine
+                                ($"[blue]{userName}[/][yellow] <{DateTime.Now.ToString("HH:mm:ss")}>[/]: [green]{message}[/]"); // Change for deafult console
+                        }
+                        catch
+                        {
+                            // Needs to be beter, for example coloring
+                            Console.WriteLine($"{userName} <{DateTime.Now.ToString("HH:mm:ss")}>[/]: {message}");
+                        }
                         Console.SetCursorPosition(0, windowHeight - 1);
-                        Console.Write("Message: ");
+                        AnsiConsole.Markup($"[blue]You[/][yellow]<{DateTime.Now.ToString("HH: mm:ss")}>[/]: ");
                         Console.CursorVisible = true;
                     }
                 });
 
-                string? message;
+                string message = string.Empty;
+
                 do
                 {
                     lock (bufferLock)
@@ -62,17 +74,20 @@ namespace Falcon.Client.Services
                     }
 
                     message = Console.ReadLine();
-                    if (message is not null || message![0] != '/')
+                    if (message.Length != 0) // Disables option to send empty messages
                     {
-                        lock (bufferLock)
+                        if (message is not null || message![0] != '/')
                         {
-                            connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
-                            Console.CursorVisible = false;
+                            lock (bufferLock)
+                            {
+                                connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
+                                Console.CursorVisible = false;
+                            }
                         }
-                    }
-                    if (message[0] == '/' && Commands.Contains(message))
-                    {
-                        ExecuteCommand();
+                        if (message[0] == '/' && Commands.Contains(message))
+                        {
+                            ExecuteCommand();
+                        }
                     }
                 } while (!string.Equals(message, "/quit", StringComparison.OrdinalIgnoreCase));
             }

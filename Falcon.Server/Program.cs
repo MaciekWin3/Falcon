@@ -67,6 +67,7 @@ builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 
 // Services
 builder.Services.AddTransient<IMessageService, MessageService>();
+builder.Services.AddSingleton<IDictionary<string, UserConnection>>(opts => new Dictionary<string, UserConnection>());
 
 // Swagger
 builder.Services.AddSwaggerGen(options =>

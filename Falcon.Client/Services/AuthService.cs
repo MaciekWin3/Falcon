@@ -23,7 +23,7 @@ namespace Falcon.Client.Services
                 var userCredentials = GetUserCredentials();
 
                 var response = await Authorize(userCredentials);
-                if (response.Length != 0)
+                if (response.Length != 0) // Maybe there is a better way
                 {
                     AnsiConsole.MarkupLine($"[green]Login successful![/]");
                     return response;

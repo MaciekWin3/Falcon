@@ -24,12 +24,13 @@ namespace Falcon.Client.Services
 
         public async Task RunAsync()
         {
+            // TODO: move connection to ctor
             string token = await authService.Login();
             Console.Clear(); // Check it
             if (token.Length != 0)
             {
                 var connection = new HubConnectionBuilder()
-                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token) // ???
+                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
@@ -39,6 +40,16 @@ namespace Falcon.Client.Services
                    .Build();
 
                 connection.StartAsync().Wait();
+
+                connection.InvokeAsync("SendActiveRooms").Wait();
+                connection.On("ActiveRooms", (IList<string> rooms) =>
+                {
+                    foreach (var room in rooms)
+                    {
+                        Console.WriteLine(room);
+                    }
+                });
+
                 connection.On("ReceiveMessage", (string userName, string message) =>
                 {
                     lock (bufferLock)
@@ -80,7 +91,7 @@ namespace Falcon.Client.Services
                         {
                             lock (bufferLock)
                             {
-                                connection.InvokeCoreAsync("SendMessageAsync", args: new[] { "Maciek", message });
+                                connection.InvokeCoreAsync("SendMessageAsync", args: new[] { message });
                                 Console.CursorVisible = false;
                             }
                         }

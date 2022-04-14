@@ -6,6 +6,7 @@ using Falcon.Server.Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
@@ -120,6 +121,14 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseFileServer(new FileServerOptions
+{
+    FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")),
+    RequestPath = "/index",
+    EnableDefaultFiles = true
+});
+
 app.UseCors(builder => builder
     .WithOrigins("null")
     .AllowAnyHeader()
@@ -131,7 +140,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => "Hello Falcon!");
+app.MapGet("/", () => Results.Redirect("/index"));
 
 app.UseEndpoints(endpoints =>
 {

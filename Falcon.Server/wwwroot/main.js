@@ -2,6 +2,7 @@
     data() {
         return {
             message: 'Hello Vue!',
+            number: 1,
             stats: null
         }
     },

@@ -13,7 +13,7 @@ namespace Falcon.Server.Hubs
         private readonly string _botUser;
         private readonly IMessageService messageService;
         private readonly IConfiguration configuration;
-        private readonly IDictionary<string, UserConnection> connections; // readonly?
+        private IDictionary<string, UserConnection> connections;
 
         private HashSet<string> Rooms { get; set; } = new HashSet<string>()
         {
@@ -33,11 +33,7 @@ namespace Falcon.Server.Hubs
         public override Task OnConnectedAsync()
         {
             var user = Context.UserIdentifier;
-            connections.Add(Context.ConnectionId, new UserConnection
-            {
-                User = user,
-                Room = "All"
-            });
+            connections.Add(Context.ConnectionId, new UserConnection(user, "All"));
             Console.WriteLine($"-----> Connection established: {Context.ConnectionId}");
             return base.OnConnectedAsync();
         }
@@ -47,11 +43,24 @@ namespace Falcon.Server.Hubs
             if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
                 connections.Remove(Context.ConnectionId);
-                Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, $"{userConnection.User} has left");
+                Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, $"{userConnection.Username} has left");
                 SendUsersConnected(userConnection.Room);
             }
             Console.WriteLine($"-----> Connection closed: {Context.ConnectionId}");
             return base.OnDisconnectedAsync(exception);
+        }
+
+        public async Task SendGroupMessageAsync(string message)
+        {
+            // Need some changes
+            var user = Context.UserIdentifier;
+            if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            {
+                await Clients.OthersInGroup(userConnection.Room).SendAsync("ReceiveMessage", userConnection.Username, message);
+            }
+            string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
+            //await Clients.Others.SendAsync("ReceiveMessage", user, message);
+            await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
         }
 
         public async Task AddToGroup(string groupName)
@@ -66,26 +75,13 @@ namespace Falcon.Server.Hubs
             await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has left the group {groupName}.");
         }
 
-        public async Task JoinRoom(UserConnection userConnection)
+        public async Task JoinRoom(string room)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, userConnection.Room);
-            connections[Context.ConnectionId] = userConnection;
-            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser,
-                $"{userConnection.User} has joined {userConnection.Room}");
-            await SendUsersConnected(userConnection.Room);
-        }
-
-        public async Task SendMessageAsync(string message)
-        {
-            // Need some changes
-            var user = Context.UserIdentifier;
-            if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
-            {
-                await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", userConnection.User, message);
-            }
-            string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
-            await Clients.Others.SendAsync("ReceiveMessage", user, message);
-            await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
+            await Groups.AddToGroupAsync(Context.ConnectionId, room);
+            connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
+            await Clients.Group(room).SendAsync("ReceiveMessage", _botUser,
+                $"{Context.UserIdentifier} has joined {room}");
+            await SendUsersConnected(room);
         }
 
         public void ConnectToRoom(string room)
@@ -102,7 +98,7 @@ namespace Falcon.Server.Hubs
         {
             var users = connections.Values
                 .Where(c => c.Room == room)
-                .Select(c => c.User);
+                .Select(c => c.Username);
 
             return Clients.Group(room).SendAsync("UsersInRoom", users);
         }

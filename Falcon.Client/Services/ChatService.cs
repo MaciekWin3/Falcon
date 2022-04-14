@@ -7,7 +7,7 @@ namespace Falcon.Client.Services
     public class ChatService : IChatService
     {
         private static readonly object bufferLock = new();
-        private static int windowHeight = Console.BufferHeight;
+        private static readonly int windowHeight = Console.BufferHeight;
         private readonly IAuthService authService;
 
         private readonly List<string> Commands = new()
@@ -56,11 +56,11 @@ namespace Falcon.Client.Services
                             .AddChoices(roomsLocal));
 
                 // TODO
-                await connection.InvokeAsync("ConnectToRoom");
-
-                connection.On("JoinRoom", (string room) =>
-                {
-                });
+                //await connection.InvokeAsync("ConnectToRoom");
+                await connection.InvokeCoreAsync("JoinRoom", args: new[] { "Maciek" });
+                //connection.On("JoinRoom", (string room) =>
+                //{
+                //});
 
                 connection.On("ReceiveMessage", (string userName, string message) =>
                 {
@@ -72,15 +72,15 @@ namespace Falcon.Client.Services
                         try
                         {
                             AnsiConsole.MarkupLine
-                                ($"[blue]{userName}[/][yellow] <{DateTime.Now.ToString("HH:mm:ss")}>[/]: [green]{message}[/]"); // Change for deafult console
+                                ($"[blue]{userName}[/][yellow] <{DateTime.Now:HH:mm:ss}>[/]: [green]{message}[/]"); // Change for deafult console
                         }
                         catch
                         {
                             // Needs to be beter, for example coloring
-                            Console.WriteLine($"{userName} <{DateTime.Now.ToString("HH:mm:ss")}>[/]: {message}");
+                            Console.WriteLine($"{userName} <{DateTime.Now:HH:mm:ss}>[/]: {message}");
                         }
                         Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.Markup($"[blue]You[/][yellow]<{DateTime.Now.ToString("HH: mm:ss")}>[/]: ");
+                        AnsiConsole.Markup($"[blue]You[/][yellow]<{DateTime.Now:HH: mm:ss}>[/]: ");
                         Console.CursorVisible = true;
                     }
                 });
@@ -103,7 +103,7 @@ namespace Falcon.Client.Services
                         {
                             lock (bufferLock)
                             {
-                                connection.InvokeCoreAsync("SendMessageAsync", args: new[] { message });
+                                connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
                                 Console.CursorVisible = false;
                             }
                         }

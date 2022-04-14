@@ -13,7 +13,12 @@ namespace Falcon.Server.Hubs
         private readonly string _botUser;
         private readonly IMessageService messageService;
         private readonly IConfiguration configuration;
-        private readonly IDictionary<string, UserConnection> connections;
+        private readonly IDictionary<string, UserConnection> connections; // readonly?
+
+        private HashSet<string> Rooms { get; set; } = new HashSet<string>()
+        {
+            "All"
+        };
 
         public ChatHub(IMessageService messageService, IConfiguration configuration,
             IDictionary<string, UserConnection> connections)
@@ -27,6 +32,12 @@ namespace Falcon.Server.Hubs
         // Connections management
         public override Task OnConnectedAsync()
         {
+            var user = Context.UserIdentifier;
+            connections.Add(Context.ConnectionId, new UserConnection
+            {
+                User = user,
+                Room = "All"
+            });
             Console.WriteLine($"-----> Connection established: {Context.ConnectionId}");
             return base.OnConnectedAsync();
         }
@@ -75,6 +86,16 @@ namespace Falcon.Server.Hubs
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             await Clients.Others.SendAsync("ReceiveMessage", user, message);
             await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
+        }
+
+        public void ConnectToRoom(string room)
+        {
+            connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
+            if (userConnection is not null)
+            {
+                Rooms.Add(room);
+                userConnection.Room = room;
+            }
         }
 
         public Task SendUsersConnected(string room)

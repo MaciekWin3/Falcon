@@ -42,12 +42,24 @@ namespace Falcon.Client.Services
                 connection.StartAsync().Wait();
 
                 connection.InvokeAsync("SendActiveRooms").Wait();
-                connection.On("ActiveRooms", (IList<string> rooms) =>
+                var roomsLocal = new List<string>()
                 {
-                    foreach (var room in rooms)
-                    {
-                        Console.WriteLine(room);
-                    }
+                    "All",
+                    "Maciek",
+                    "dotnet"
+                };
+                var room = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Choose room: ")
+                            .PageSize(10)
+                            .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
+                            .AddChoices(roomsLocal));
+
+                // TODO
+                await connection.InvokeAsync("ConnectToRoom");
+
+                connection.On("JoinRoom", (string room) =>
+                {
                 });
 
                 connection.On("ReceiveMessage", (string userName, string message) =>

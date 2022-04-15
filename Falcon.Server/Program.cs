@@ -3,6 +3,7 @@ using Falcon.Server.Features.Auth.Models;
 using Falcon.Server.Features.Messages.Repositories;
 using Falcon.Server.Features.Messages.Services;
 using Falcon.Server.Hubs;
+using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,12 +15,25 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddAuthentication(
+        CertificateAuthenticationDefaults.AuthenticationScheme)
+    .AddCertificate();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSignalR();
 builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
+//builder.WebHost
+//    .UseUrls("http://192.168.1.25:5262", "https://localhost:7262", "http://localhost:5262")
+//    .ConfigureKestrel(options =>
+//    {
+//        //options.Listen(System.Net.IPAddress.Parse("192.168.1.25"), 7262);
+//        options.Listen(System.Net.IPAddress.Parse("192.168.1.25"), 5262);
+//        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 7262);
+//        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 5262);
+//    });
 
 // Database
 builder.Services.AddDbContext<FalconDbContext>(options =>
@@ -140,7 +154,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapGet("/", () => Results.Redirect("/index"));
+app.MapGet("/", () => Results.Redirect("/index.html"));
 
 app.UseEndpoints(endpoints =>
 {

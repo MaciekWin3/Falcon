@@ -30,6 +30,7 @@ namespace Falcon.Client.Services
             if (token.Length != 0)
             {
                 var connection = new HubConnectionBuilder()
+                   //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
                    .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {

@@ -8,7 +8,9 @@ namespace Falcon.Client.Services
     public class AuthService : IAuthService
     {
         private readonly IHttpClientFactory httpClientFactory;
+
         private static readonly string baseUrl = "https://localhost:7262";
+        //private static readonly string baseUrl = "http://192.168.1.25:5262";
 
         public AuthService(IHttpClientFactory httpClientFactory)
         {

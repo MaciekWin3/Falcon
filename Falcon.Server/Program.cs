@@ -10,8 +10,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 using System.Security.Claims;
 using System.Text;
+using ILogger = Serilog.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +37,14 @@ builder.Services.AddHttpClient();
 //        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 7262);
 //        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 5262);
 //    });
+
+// Logger
+builder.Logging.ClearProviders();
+ILogger logger = new LoggerConfiguration()
+    .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+    .CreateLogger();
+builder.Logging.AddSerilog(logger);
+builder.Services.AddSingleton(logger);
 
 // Database
 builder.Services.AddDbContext<FalconDbContext>(options =>

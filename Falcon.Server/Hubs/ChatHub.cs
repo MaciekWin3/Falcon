@@ -54,7 +54,6 @@ namespace Falcon.Server.Hubs
         public async Task SendGroupMessageAsync(string message)
         {
             // Need some changes
-
             var user = Context.UserIdentifier;
             if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
@@ -99,15 +98,6 @@ namespace Falcon.Server.Hubs
         public List<string> ShowActiveRooms()
         {
             return Rooms.ToList();
-        }
-
-        public void ConnectToRoom(string room)
-        {
-            connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
-            if (userConnection is not null)
-            {
-                userConnection.Room = room;
-            }
         }
 
         private string CompressAndEncryptMessage(string message)

@@ -9,16 +9,24 @@ Falcon is terminal chat app built on .NET platform.
 * [Spectre Console](https://github.com/spectreconsole/spectre.console)
 
 ## TODO 📝
-- [ ] Implement connection to db to store messages
-- [ ] Implement room functionality
+- [x] Authorization
+- [x] Implement connection to db to store messages
+- [x] Implement room functionality
 - [ ] Finish chat UI
 - [ ] Add emotes and charts to messages
-- [ ] Authorization
-- [ ] Own server?
+- [ ] Commands
+- [ ] Configuration file
+- [ ] Finish project page
+- [ ] Make Blazor PWA Client
+- [ ] Create new channel option
+- [ ] Add logger
+
+
 
 ## Known issues
 * Window error
 * Auth error
+* Vue error
 
 
 ## Support

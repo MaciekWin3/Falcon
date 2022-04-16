@@ -84,7 +84,7 @@ namespace Falcon.Client.Services
             await chatService.RunAsync();
         }
 
-        private void Exit()
+        private static void Exit()
         {
             AnsiConsole.Markup("[red]Exiting...[/]");
             Environment.Exit(1);

@@ -13,17 +13,18 @@ namespace Falcon.Server.Hubs
         private readonly string _botUser;
         private readonly IMessageService messageService;
         private readonly IConfiguration configuration;
-        private IDictionary<string, UserConnection> connections;
+        private IDictionary<string, UserConnection> connections { get; set; }
 
         private HashSet<string> Rooms { get; set; } = new HashSet<string>()
         {
-            "All"
+            "All",
+            "Programming"
         };
 
         public ChatHub(IMessageService messageService, IConfiguration configuration,
             IDictionary<string, UserConnection> connections)
         {
-            _botUser = "MyChat Bot";
+            _botUser = "Falcon Bot";
             this.messageService = messageService;
             this.configuration = configuration;
             this.connections = connections;
@@ -53,6 +54,7 @@ namespace Falcon.Server.Hubs
         public async Task SendGroupMessageAsync(string message)
         {
             // Need some changes
+
             var user = Context.UserIdentifier;
             if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
@@ -60,6 +62,7 @@ namespace Falcon.Server.Hubs
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             //await Clients.Others.SendAsync("ReceiveMessage", user, message);
+            var x = Context.Items;
             await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
         }
 
@@ -84,16 +87,6 @@ namespace Falcon.Server.Hubs
             await SendUsersConnected(room);
         }
 
-        public void ConnectToRoom(string room)
-        {
-            connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
-            if (userConnection is not null)
-            {
-                Rooms.Add(room);
-                userConnection.Room = room;
-            }
-        }
-
         public Task SendUsersConnected(string room)
         {
             var users = connections.Values
@@ -103,13 +96,18 @@ namespace Falcon.Server.Hubs
             return Clients.Group(room).SendAsync("UsersInRoom", users);
         }
 
-        public Task SendActiveRooms()
+        public List<string> ShowActiveRooms()
         {
-            var rooms = connections.Values
-                .Select(c => c.Room)
-                .ToList();
+            return Rooms.ToList();
+        }
 
-            return Clients.All.SendAsync("ActiveRooms", rooms);
+        public void ConnectToRoom(string room)
+        {
+            connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
+            if (userConnection is not null)
+            {
+                userConnection.Room = room;
+            }
         }
 
         private string CompressAndEncryptMessage(string message)

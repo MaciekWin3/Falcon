@@ -9,6 +9,7 @@ namespace Falcon.Client.Services
         private static readonly object bufferLock = new();
         private static readonly int windowHeight = Console.BufferHeight;
         private readonly IAuthService authService;
+        private HubConnection connection;
 
         private readonly List<string> Commands = new()
         {
@@ -24,44 +25,12 @@ namespace Falcon.Client.Services
 
         public async Task RunAsync()
         {
-            // TODO: move connection to ctor
             string token = await authService.Login();
             Console.Clear(); // Check it
             if (token.Length != 0)
             {
-                var connection = new HubConnectionBuilder()
-                   //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
-                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
-                   .ConfigureLogging(configureLogging =>
-                   {
-                       configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
-                       configureLogging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
-                   })
-                   .WithAutomaticReconnect() // Handle it
-                   .Build();
-
-                connection.StartAsync().Wait();
-
-                connection.InvokeAsync("SendActiveRooms").Wait();
-                var roomsLocal = new List<string>()
-                {
-                    "All",
-                    "Maciek",
-                    "dotnet"
-                };
-                var room = AnsiConsole.Prompt(
-                        new SelectionPrompt<string>()
-                            .Title("Choose room: ")
-                            .PageSize(10)
-                            .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
-                            .AddChoices(roomsLocal));
-
-                // TODO
-                //await connection.InvokeAsync("ConnectToRoom");
-                await connection.InvokeCoreAsync("JoinRoom", args: new[] { "Maciek" });
-                //connection.On("JoinRoom", (string room) =>
-                //{
-                //});
+                ConnectionInitializer(token);
+                await ChooseRoom();
 
                 connection.On("ReceiveMessage", (string userName, string message) =>
                 {
@@ -73,15 +42,15 @@ namespace Falcon.Client.Services
                         try
                         {
                             AnsiConsole.MarkupLine
-                                ($"[blue]{userName}[/][yellow] <{DateTime.Now:HH:mm:ss}>[/]: [green]{message}[/]"); // Change for deafult console
+                                ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
                         }
                         catch
                         {
                             // Needs to be beter, for example coloring
-                            Console.WriteLine($"{userName} <{DateTime.Now:HH:mm:ss}>[/]: {message}");
+                            Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
                         }
                         Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.Markup($"[blue]You[/][yellow]<{DateTime.Now:HH: mm:ss}>[/]: ");
+                        AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
                         Console.CursorVisible = true;
                     }
                 });
@@ -93,10 +62,9 @@ namespace Falcon.Client.Services
                     lock (bufferLock)
                     {
                         Console.SetCursorPosition(0, windowHeight - 1);
-                        Console.Write("Message: ");
+                        AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
                         Console.CursorVisible = true;
                     }
-
                     message = Console.ReadLine();
                     if (message.Length != 0) // Disables option to send empty messages
                     {
@@ -119,6 +87,36 @@ namespace Falcon.Client.Services
             {
                 Console.WriteLine("Application stopped working!");
             }
+        }
+
+        protected void ConnectionInitializer(string token)
+        {
+            connection = new HubConnectionBuilder()
+                   //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
+                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
+                   .ConfigureLogging(configureLogging =>
+                   {
+                       configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
+                       configureLogging.AddFilter("Microsoft.AspNetCore.Http.Connections", LogLevel.Debug);
+                   })
+                   .WithAutomaticReconnect() // Handle it
+                   .Build();
+
+            connection.StartAsync().Wait();
+        }
+
+        protected async Task ChooseRoom()
+        {
+            var rooms = await connection.InvokeAsync<IList<string>>("ShowActiveRooms");
+
+            var room = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Choose room: ")
+                        .PageSize(10)
+                        .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
+                        .AddChoices(rooms));
+
+            await connection.InvokeCoreAsync("JoinRoom", args: new[] { room });
         }
 
         public void ExecuteCommand()

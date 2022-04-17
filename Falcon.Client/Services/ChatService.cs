@@ -57,8 +57,8 @@ namespace Falcon.Client.Services
             if (token.Length != 0)
             {
                 connection = new HubConnectionBuilder()
-                   //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
-                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
+                   .WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
+                   //.WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
@@ -104,6 +104,7 @@ namespace Falcon.Client.Services
             Console.Clear();
             Console.SetCursorPosition(0, 0);
             var rooms = await connection.InvokeAsync<IList<string>>("ShowActiveRooms");
+            rooms.Add("Create new room");
 
             var room = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
@@ -112,7 +113,29 @@ namespace Falcon.Client.Services
                         .MoreChoicesText("[grey](Move up and down to reveal more fruits)[/]")
                         .AddChoices(rooms));
 
+            if (room == "Create new room")
+            {
+                await CreateNewRoom();
+                return;
+            }
+
             await connection.InvokeCoreAsync("JoinRoom", args: new[] { room });
+        }
+
+        protected async Task CreateNewRoom()
+        {
+            // Need more work
+            Console.Clear();
+            var roomName = AnsiConsole.Ask<string>("Room name: ");
+            var created = await connection.InvokeCoreAsync<bool>("CreateRoom", args: new[] { roomName });
+            if (created)
+            {
+                await ChooseRoom();
+            }
+            else
+            {
+                Environment.Exit(-1);
+            }
         }
 
         private async Task ExecuteCommand(string command)

@@ -16,21 +16,17 @@ namespace Falcon.Server.Hubs
         private readonly IConfiguration configuration;
         private readonly ILogger logger;
         private IDictionary<string, UserConnection> Connections { get; set; }
-
-        private HashSet<string> Rooms { get; set; } = new HashSet<string>()
-        {
-            "All",
-            "Programming"
-        };
+        private HashSet<string> Rooms { get; set; }
 
         public ChatHub(IMessageService messageService, IConfiguration configuration,
-            ILogger logger, IDictionary<string, UserConnection> connections)
+            ILogger logger, IDictionary<string, UserConnection> connections, HashSet<string> rooms)
         {
             falconBot = "Falcon Bot";
             this.messageService = messageService;
             this.configuration = configuration;
             this.logger = logger;
-            this.Connections = connections;
+            Connections = connections;
+            Rooms = rooms;
         }
 
         public override Task OnConnectedAsync()
@@ -96,6 +92,17 @@ namespace Falcon.Server.Hubs
                .ToList();
 
             return users;
+        }
+
+        public bool CreateRoom(string room)
+        {
+            if (Rooms.Contains(room))
+            {
+                return false;
+            }
+            Rooms.Add(room);
+            logger.Information("Room {0} created", room);
+            return true;
         }
 
         private string GetUserGroup()

@@ -14,6 +14,7 @@ namespace Falcon.Client.Services
         private readonly List<string> Commands = new()
         {
             "/quit",
+            "/exit",
             "/active",
             "/chart"
         };
@@ -25,73 +26,44 @@ namespace Falcon.Client.Services
 
         public async Task RunAsync()
         {
-            string token = await authService.Login();
-            Console.Clear(); // Check it
-            if (token.Length != 0)
+            await ConnectionInitializer();
+            await ChooseRoom();
+            string message;
+            do
             {
-                ConnectionInitializer(token);
-                await ChooseRoom();
-
-                connection.On("ReceiveMessage", (string userName, string message) =>
+                lock (bufferLock)
                 {
-                    lock (bufferLock)
-                    {
-                        // Need changes
-                        Console.CursorVisible = false;
-                        Console.SetCursorPosition(0, windowHeight - 1);
-                        try
-                        {
-                            AnsiConsole.MarkupLine
-                                ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
-                        }
-                        catch
-                        {
-                            // Needs to be beter, for example coloring
-                            Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
-                        }
-                        Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
-                        Console.CursorVisible = true;
-                    }
-                });
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    Console.CursorVisible = true;
+                }
+                message = Console.ReadLine();
 
-                string message = string.Empty;
-
-                do
+                // if else for commands
+                if (message.Length != 0)
                 {
-                    lock (bufferLock)
+                    if (message is not null || message![0] != '/')
                     {
-                        Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
-                        Console.CursorVisible = true;
-                    }
-                    message = Console.ReadLine();
-                    if (message.Length != 0) // Disables option to send empty messages
-                    {
-                        if (message is not null || message![0] != '/')
+                        lock (bufferLock)
                         {
-                            lock (bufferLock)
-                            {
-                                connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
-                                Console.CursorVisible = false;
-                            }
-                        }
-                        if (message[0] == '/' && Commands.Contains(message))
-                        {
-                            ExecuteCommand();
+                            connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
+                            Console.CursorVisible = false;
                         }
                     }
-                } while (!string.Equals(message, "/quit", StringComparison.OrdinalIgnoreCase));
-            }
-            else
-            {
-                Console.WriteLine("Application stopped working!");
-            }
+                    if (message[0] == '/' && Commands.Contains(message)) // Is this necesary?
+                    {
+                        await ExecuteCommand(message);
+                    }
+                }
+            } while (!string.Equals(message, "/exit", StringComparison.OrdinalIgnoreCase));
         }
 
-        protected void ConnectionInitializer(string token)
+        protected async Task ConnectionInitializer()
         {
-            connection = new HubConnectionBuilder()
+            string token = await authService.Login();
+            if (token.Length != 0)
+            {
+                connection = new HubConnectionBuilder()
                    //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
                    .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
@@ -101,12 +73,43 @@ namespace Falcon.Client.Services
                    })
                    .WithAutomaticReconnect() // Handle it
                    .Build();
+            }
+            else
+            {
+                Console.WriteLine("Application stopped working!");
+            }
+            Console.Clear(); // Check it
 
             connection.StartAsync().Wait();
+
+            connection.On("ReceiveMessage", (string userName, string message) =>
+            {
+                lock (bufferLock)
+                {
+                    // Need changes
+                    Console.CursorVisible = false;
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    try
+                    {
+                        AnsiConsole.MarkupLine
+                            ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
+                    }
+                    catch
+                    {
+                        // Needs to be beter, for example coloring
+                        Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
+                    }
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    Console.CursorVisible = true;
+                }
+            });
         }
 
         protected async Task ChooseRoom()
         {
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
             var rooms = await connection.InvokeAsync<IList<string>>("ShowActiveRooms");
 
             var room = AnsiConsole.Prompt(
@@ -119,9 +122,17 @@ namespace Falcon.Client.Services
             await connection.InvokeCoreAsync("JoinRoom", args: new[] { room });
         }
 
-        public void ExecuteCommand()
+        private async Task ExecuteCommand(string command)
         {
-            throw new NotImplementedException();
+            switch (command)
+            {
+                case "/quit":
+                    await ChooseRoom();
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
     }
 }

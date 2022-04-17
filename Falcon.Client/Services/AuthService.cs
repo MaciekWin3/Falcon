@@ -38,7 +38,7 @@ namespace Falcon.Client.Services
             return string.Empty;
         }
 
-        private UserDTO GetUserCredentials()
+        private static UserDTO GetUserCredentials()
         {
             var username = AnsiConsole.Ask<string>("Username: ");
             var password = AnsiConsole.Prompt(
@@ -68,7 +68,7 @@ namespace Falcon.Client.Services
             return token;
         }
 
-        private void ShowErrorMessage(int tryNumber)
+        private static void ShowErrorMessage(int tryNumber)
         {
             if (tryNumber == 2)
             {

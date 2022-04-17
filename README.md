@@ -20,6 +20,8 @@ Falcon is terminal chat app built on .NET platform.
 - [ ] Make Blazor PWA Client
 - [ ] Create new channel option
 - [ ] Add logger
+- [ ] Strongly typed hub
+- [ ] Revisit database
 
 
 

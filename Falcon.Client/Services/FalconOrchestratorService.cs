@@ -38,7 +38,7 @@ namespace Falcon.Client.Services
             await RunAsync(choice);
         }
 
-        private MenuOption ParseMenuChoice(string option)
+        private static MenuOption ParseMenuChoice(string option)
         {
             return (MenuOption)int.Parse(option[0].ToString());
         }

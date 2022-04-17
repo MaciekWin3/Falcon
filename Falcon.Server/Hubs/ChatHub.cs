@@ -4,16 +4,18 @@ using Falcon.Server.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using ILogger = Serilog.ILogger;
 
 namespace Falcon.Server.Hubs
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatHub : Hub
     {
-        private readonly string _botUser;
+        private readonly string falconBot;
         private readonly IMessageService messageService;
         private readonly IConfiguration configuration;
-        private IDictionary<string, UserConnection> connections { get; set; }
+        private readonly ILogger logger;
+        private IDictionary<string, UserConnection> Connections { get; set; }
 
         private HashSet<string> Rooms { get; set; } = new HashSet<string>()
         {
@@ -22,73 +24,64 @@ namespace Falcon.Server.Hubs
         };
 
         public ChatHub(IMessageService messageService, IConfiguration configuration,
-            IDictionary<string, UserConnection> connections)
+            ILogger logger, IDictionary<string, UserConnection> connections)
         {
-            _botUser = "Falcon Bot";
+            falconBot = "Falcon Bot";
             this.messageService = messageService;
             this.configuration = configuration;
-            this.connections = connections;
+            this.logger = logger;
+            this.Connections = connections;
         }
 
-        // Connections management
         public override Task OnConnectedAsync()
         {
             var user = Context.UserIdentifier;
-            connections.Add(Context.ConnectionId, new UserConnection(user, "All"));
-            Console.WriteLine($"-----> Connection established: {Context.ConnectionId}");
+            Connections.Add(Context.ConnectionId, new UserConnection(user, "All"));
+            logger.Information("Connection established: {0}, user: {1}", Context.ConnectionId, user);
             return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            if (Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
-                connections.Remove(Context.ConnectionId);
-                Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", _botUser, $"{userConnection.Username} has left");
+                Connections.Remove(Context.ConnectionId);
+                Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", falconBot, $"{userConnection.Username} has left");
                 SendUsersConnected(userConnection.Room);
             }
-            Console.WriteLine($"-----> Connection closed: {Context.ConnectionId}");
+            logger.Information("Connection closed: {0}, user: {1}", Context.ConnectionId, Context.UserIdentifier);
             return base.OnDisconnectedAsync(exception);
         }
 
         public async Task SendGroupMessageAsync(string message)
         {
-            // Need some changes
-            var user = Context.UserIdentifier;
-            if (connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
+            if (Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
                 await Clients.OthersInGroup(userConnection.Room).SendAsync("ReceiveMessage", userConnection.Username, message);
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             //await Clients.Others.SendAsync("ReceiveMessage", user, message);
-            var x = Context.Items;
             await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
-        }
-
-        public async Task AddToGroup(string groupName)
-        {
-            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has joined the group {groupName}.");
-        }
-
-        public async Task RemoveFromGroup(string groupName)
-        {
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-            await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has left the group {groupName}.");
         }
 
         public async Task JoinRoom(string room)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
-            connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
-            await Clients.Group(room).SendAsync("ReceiveMessage", _botUser,
+            Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
+            await Clients.Group(room).SendAsync("ReceiveMessage", falconBot,
                 $"{Context.UserIdentifier} has joined {room}");
+            logger.Information("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
             await SendUsersConnected(room);
+        }
+
+        public async Task QuitRoom(string room)
+        {
+            throw new NotImplementedException();
         }
 
         public Task SendUsersConnected(string room)
         {
-            var users = connections.Values
+            var users = Connections.Values
                 .Where(c => c.Room == room)
                 .Select(c => c.Username);
 

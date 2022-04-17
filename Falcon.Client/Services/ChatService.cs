@@ -11,14 +11,6 @@ namespace Falcon.Client.Services
         private readonly IAuthService authService;
         private HubConnection connection;
 
-        private readonly List<string> Commands = new()
-        {
-            "/quit",
-            "/exit",
-            "/active",
-            "/chart"
-        };
-
         public ChatService(IAuthService authService)
         {
             this.authService = authService;
@@ -43,7 +35,7 @@ namespace Falcon.Client.Services
                 // if else for commands
                 if (message.Length != 0)
                 {
-                    if (message is not null || message![0] != '/')
+                    if (message is not null && message[0] != '/')
                     {
                         lock (bufferLock)
                         {
@@ -51,7 +43,7 @@ namespace Falcon.Client.Services
                             Console.CursorVisible = false;
                         }
                     }
-                    if (message[0] == '/' && Commands.Contains(message)) // Is this necesary?
+                    if (message[0] == '/')
                     {
                         await ExecuteCommand(message);
                     }
@@ -132,8 +124,21 @@ namespace Falcon.Client.Services
                     await ChooseRoom();
                     break;
 
+                case "/users":
+                    // Needs improvemnts and move to own function
+                    var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
+                    var table = new Table();
+                    table.AddColumn("Users");
+                    foreach (var user in users)
+                    {
+                        table.AddRow($"[green]{user}[/]");
+                    }
+                    AnsiConsole.Write(table);
+                    break;
+
                 default:
-                    throw new NotImplementedException();
+                    AnsiConsole.WriteLine("[red]Invalid command![/]");
+                    break;
             }
         }
     }

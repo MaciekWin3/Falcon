@@ -33,6 +33,7 @@ namespace Falcon.Client.Services
             {
                 lock (bufferLock)
                 {
+                    // Move to other function???
                     Console.SetCursorPosition(0, windowHeight - 1);
                     AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
                     Console.CursorVisible = true;
@@ -127,6 +128,7 @@ namespace Falcon.Client.Services
             switch (command)
             {
                 case "/quit":
+                    await connection.InvokeAsync("QuitRoom");
                     await ChooseRoom();
                     break;
 

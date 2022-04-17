@@ -74,9 +74,14 @@ namespace Falcon.Server.Hubs
             await SendUsersConnected(room);
         }
 
-        public async Task QuitRoom(string room)
+        public async Task QuitRoom()
         {
-            throw new NotImplementedException();
+            Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, userConnection.Room);
+            Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, null);
+            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", falconBot,
+                $"{Context.UserIdentifier} has left {userConnection.Room}");
+            logger.Information("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
         }
 
         public Task SendUsersConnected(string room)
@@ -91,6 +96,10 @@ namespace Falcon.Server.Hubs
         public List<string> ShowActiveRooms()
         {
             return Rooms.ToList();
+        }
+
+        public List<string> ShowActiveUsers()
+        {
         }
 
         private string CompressAndEncryptMessage(string message)

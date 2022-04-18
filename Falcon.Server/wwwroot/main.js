@@ -6,7 +6,7 @@
             stats: null
         }
     },
-    async created() {
+    mounted() {
         fetch("https://api.github.com/repos/MaciekWin3/chess-clock-react-native")
             .then(response => response.json())
             .then(data => this.stats = data);

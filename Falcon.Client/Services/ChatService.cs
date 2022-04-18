@@ -57,8 +57,8 @@ namespace Falcon.Client.Services
             if (token.Length != 0)
             {
                 connection = new HubConnectionBuilder()
-                   .WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
-                   //.WithUrl($"https://localhost:7262/chathub?access_token=" + token)
+                   //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
+                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
@@ -104,7 +104,6 @@ namespace Falcon.Client.Services
             Console.Clear();
             Console.SetCursorPosition(0, 0);
             var rooms = await connection.InvokeAsync<IList<string>>("ShowActiveRooms");
-            rooms.Add("Create new room");
 
             var room = AnsiConsole.Prompt(
                     new SelectionPrompt<string>()
@@ -160,7 +159,7 @@ namespace Falcon.Client.Services
                     break;
 
                 default:
-                    AnsiConsole.WriteLine("[red]Invalid command![/]");
+                    AnsiConsole.MarkupLine("[red]Invalid command![/]");
                     break;
             }
         }

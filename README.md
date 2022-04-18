@@ -22,13 +22,14 @@ Falcon is terminal chat app built on .NET platform.
 - [ ] Add logger
 - [ ] Strongly typed hub
 - [ ] Revisit database
+- [ ] Add method checkConnection/pingServer
 
 
 
 ## Known issues
 * Window error
-* Auth error
-* Vue error
+* Auth error - done
+* Vue error - done
 
 
 ## Support

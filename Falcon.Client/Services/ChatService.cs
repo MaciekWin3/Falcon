@@ -53,6 +53,7 @@ namespace Falcon.Client.Services
 
         protected async Task ConnectionInitializer()
         {
+            // Add Progress Bar???
             string token = await authService.Login();
             if (token.Length != 0)
             {
@@ -139,28 +140,37 @@ namespace Falcon.Client.Services
 
         private async Task ExecuteCommand(string command)
         {
-            switch (command)
+            List<string> splitString = command.Split(' ').ToList();
+            int index = command.IndexOf(' ', command.IndexOf(' ') + 1);
+            if (splitString[0] == "/dm")
             {
-                case "/quit":
-                    await connection.InvokeAsync("QuitRoom");
-                    await ChooseRoom();
-                    break;
+                await connection.InvokeCoreAsync("SendDirectMessage", args: new[] { command.Remove(0, index), splitString[1] });
+            }
+            else
+            {
+                switch (command)
+                {
+                    case "/quit":
+                        await connection.InvokeAsync("QuitRoom");
+                        await ChooseRoom();
+                        break;
 
-                case "/users":
-                    // Needs improvemnts and move to own function
-                    var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
-                    var table = new Table();
-                    table.AddColumn("Users");
-                    foreach (var user in users)
-                    {
-                        table.AddRow($"[green]{user}[/]");
-                    }
-                    AnsiConsole.Write(table);
-                    break;
+                    case "/users":
+                        // Needs improvemnts and move to own function
+                        var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
+                        var table = new Table();
+                        table.AddColumn("Users");
+                        foreach (var user in users)
+                        {
+                            table.AddRow($"[green]{user}[/]");
+                        }
+                        AnsiConsole.Write(table);
+                        break;
 
-                default:
-                    AnsiConsole.MarkupLine("[red]Invalid command![/]");
-                    break;
+                    default:
+                        AnsiConsole.MarkupLine("[red]Invalid command![/]");
+                        break;
+                }
             }
         }
     }

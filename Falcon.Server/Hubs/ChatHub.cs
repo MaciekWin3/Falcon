@@ -56,7 +56,29 @@ namespace Falcon.Server.Hubs
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             //await Clients.Others.SendAsync("ReceiveMessage", user, message);
-            await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
+            await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage, });
+        }
+
+        public async Task SendDirectMessage(string message, string recipient)
+        {
+            // This needs fix, also for blazor client
+            Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
+            var user = Connections.Values
+               .Where(c => c.Username == recipient)
+               .Select(c => c.Username)
+               .FirstOrDefault();
+
+            if (user == null)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", falconBot, "User not found!");
+            }
+            else
+            {
+                // Needs fix
+                await Clients.User(recipient).SendAsync("ReceiveMessage", userConnection.Username, $"[yellow]DM from {userConnection.Username}:{message}[/]");
+                string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
+                await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
+            }
         }
 
         public async Task JoinRoom(string room)

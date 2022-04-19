@@ -4,34 +4,48 @@ Terminal/PowerShell chat application.
 ## Description 🧾
 Falcon is terminal chat app built on .NET platform.
 
+## Get started 🚀
+To start using Falcon you need to...
+
 ## TechStack 💻
+### Backend
 * [SignalR](https://github.com/SignalR/SignalR)
+
+### Console client
 * [Spectre Console](https://github.com/spectreconsole/spectre.console)
 
-## TODO 📝
-- [x] Authorization
-- [x] Implement connection to db to store messages
-- [x] Implement room functionality
-- [ ] Finish chat UI
-- [ ] Add emotes and charts to messages
-- [ ] Commands
-- [ ] Configuration file
-- [ ] Finish project page
-- [ ] Make Blazor PWA Client
-- [ ] Create new channel option
-- [ ] Add logger
-- [ ] Strongly typed hub
-- [ ] Revisit database
-- [ ] Add method checkConnection/pingServer
+### Blazor PWA client - incoming
+* [MudBlazor](https://github.com/MudBlazor/MudBlazor/)
 
+### Webpage
+* [Vue](https://github.com/vuejs/vue)
+* [Bulma](https://github.com/jgthms/bulma)
 
+## Kanban board 🧾
+Backlog | Work in progress | Finished
+--- | --- | ---
+| 🐞 Fix model and database |  |  |
+| 🐞 Fix window bug |  |  |
+| 📖 Revisit UI of console client |  |  |
+| 📖 Strongly typed hubs |  |  |
+| 📖 Configuration file setup |  |  |
+| 📖 Ping Server |  |  |
+| 📖 Emojis and charts |  |  |
+| 👑 View old messages - Planning |  |  |
+| 👑 Prepare for deploy |  |  |
+| 👑 Blazor PWA client] |  |  |
+| 👑 Create mail service |  |  |
 
-## Known issues
+## Known issues ❗
 * Window error
 * Auth error - done
 * Vue error - done
 
+## Contributions 🤝
 
-## Support
+## Support 💰
 Bitcoin: bc1q4rza4tdd52jadr72xk0css9hv4p2c9ht8t0kt9
 Zilliqa: zil1z8cj5dh6rxx0gdx9zdt5q4vhtpaggdhsjmjwcm
+
+## Author 📝
+Maciej Winnik

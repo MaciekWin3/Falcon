@@ -4,6 +4,7 @@ using Falcon.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Falcon.Server.Migrations
 {
     [DbContext(typeof(FalconDbContext))]
-    partial class FalconDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220421102227_add-rooms-and-update-message-model")]
+    partial class addroomsandupdatemessagemodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

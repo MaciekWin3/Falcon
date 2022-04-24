@@ -1,4 +1,5 @@
 ﻿using Falcon.Server.Features.Auth.Models;
+using Falcon.Server.Features.Rooms.Models;
 
 namespace Falcon.Server.Features.Messages.Models
 {
@@ -7,7 +8,6 @@ namespace Falcon.Server.Features.Messages.Models
         public long Id { get; set; }
         public virtual ApplicationUser User { get; set; }
         public string Content { get; set; }
-        public string RoomId { get; set; }
-        public DateTime Date { get; set; }
+        public virtual Room Room { get; set; }
     }
 }

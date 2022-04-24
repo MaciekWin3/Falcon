@@ -1,5 +1,6 @@
 ﻿using Falcon.Server.Features.Auth.Models;
 using Falcon.Server.Features.Messages.Models;
+using Falcon.Server.Features.Rooms.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,6 +14,7 @@ namespace Falcon.Server
 
         public override DbSet<ApplicationUser> Users { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Room> Rooms { get; set; }
 
         public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken cancellationToken = default)
         {
@@ -59,6 +61,7 @@ namespace Falcon.Server
             base.OnModelCreating(modelBuilder);
             BuildModelForApplicationUsers(modelBuilder);
             BuildModelForMessages(modelBuilder);
+            BuildModelForRooms(modelBuilder);
         }
 
         private static void BuildModelForApplicationUsers(ModelBuilder modelBuilder)
@@ -70,6 +73,10 @@ namespace Falcon.Server
             modelBuilder.Entity<ApplicationUser>()
                 .HasMany(u => u.Messages)
                 .WithOne(m => m.User);
+
+            modelBuilder.Entity<ApplicationUser>()
+                .HasMany(u => u.OwnedRooms)
+                .WithOne(r => r.Owner);
         }
 
         private static void BuildModelForMessages(ModelBuilder modelBuilder)
@@ -81,6 +88,25 @@ namespace Falcon.Server
             modelBuilder.Entity<Message>()
                 .HasOne(m => m.User)
                 .WithMany(u => u.Messages);
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Room)
+                .WithMany(r => r.Messages);
+        }
+
+        private static void BuildModelForRooms(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Room>()
+                .ToTable("Rooms")
+                .HasKey(r => new { r.Id });
+
+            modelBuilder.Entity<Room>()
+               .HasMany(r => r.Messages)
+               .WithOne(m => m.Room);
+
+            modelBuilder.Entity<Room>()
+                .HasOne(r => r.Owner)
+                .WithMany(u => u.OwnedRooms);  // ?????
         }
     }
 }

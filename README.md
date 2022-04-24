@@ -5,9 +5,13 @@ Terminal/PowerShell chat application.
 Falcon is terminal chat app built on .NET platform.
 
 ## Get started 🚀
+### Download app 📡
 To start using Falcon you need to...
 
-## TechStack 💻
+### Develop localy 💻
+Download app
+
+## TechStack 📚
 ### Backend
 * [SignalR](https://github.com/SignalR/SignalR)
 

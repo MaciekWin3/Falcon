@@ -23,16 +23,23 @@ namespace Falcon.Client.Services
             for (int i = 0; i < 3; i++)
             {
                 var userCredentials = GetUserCredentials();
-
-                var response = await Authorize(userCredentials);
-                if (response.Length != 0) // Maybe there is a better way
+                try
                 {
-                    AnsiConsole.MarkupLine($"[green]Login successful![/]");
-                    return response;
+                    var response = await Authorize(userCredentials);
+                    if (response.Length != 0) // Maybe there is a better way
+                    {
+                        AnsiConsole.MarkupLine($"[green]Login successful![/]");
+                        return response;
+                    }
+                    else
+                    {
+                        ShowErrorMessage(i);
+                    }
                 }
-                else
+                catch (Exception)
                 {
-                    ShowErrorMessage(i);
+                    AnsiConsole.MarkupLine($"[red]Something went wrong! Try again later![/]");
+                    return string.Empty;
                 }
             }
             return string.Empty;

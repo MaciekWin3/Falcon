@@ -1,4 +1,4 @@
-﻿using Falcon.Client.Models;
+﻿using Falcon.Client.Enums;
 using Spectre.Console;
 
 namespace Falcon.Client.Services

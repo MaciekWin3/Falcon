@@ -18,70 +18,40 @@ namespace Falcon.Client.Services
 
         public async Task RunAsync()
         {
-            var connectionEstablished = await ConnectionInitializer();
-            if (connectionEstablished is true)
+            await ConnectionInitializer();
+            await ChooseRoom();
+            string message;
+            do
             {
-                await ChooseRoom();
-
-                string message;
-
-                do
+                lock (bufferLock)
                 {
-                    lock (bufferLock)
-                    {
-                        // Move to other function???
-                        Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
-                        Console.CursorVisible = true;
-                    }
-                    message = Console.ReadLine();
+                    // Move to other function???
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    Console.CursorVisible = true;
+                }
+                message = Console.ReadLine();
 
-                    // if else for commands
-                    if (message.Length != 0)
-                    {
-                        if (message is not null && message[0] != '/')
-                        {
-                            lock (bufferLock)
-                            {
-                                connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
-                                Console.CursorVisible = false;
-                            }
-                        }
-                        if (message[0] == '/')
-                        {
-                            await ExecuteCommand(message);
-                        }
-                    }
-                } while (!string.Equals(message, "/exit", StringComparison.OrdinalIgnoreCase));
-
-                connection.On("ReceiveMessage", (string userName, string message) =>
+                // if else for commands
+                if (message.Length != 0)
                 {
-                    lock (bufferLock)
+                    if (message is not null && message[0] != '/')
                     {
-                        // Need changes
-                        //int cl = Console.CursorLeft;
-                        //int ct = Console.CursorTop;
-                        Console.CursorVisible = false;
-                        Console.SetCursorPosition(0, windowHeight - 1);
-                        try
+                        lock (bufferLock)
                         {
-                            AnsiConsole.MarkupLine
-                                ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
+                            connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
+                            Console.CursorVisible = false;
                         }
-                        catch
-                        {
-                            // Needs to be beter, for example coloring
-                            Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
-                        }
-                        Console.SetCursorPosition(0, windowHeight - 1);
-                        AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
-                        Console.CursorVisible = true;
                     }
-                });
-            }
+                    if (message[0] == '/')
+                    {
+                        await ExecuteCommand(message);
+                    }
+                }
+            } while (!string.Equals(message, "/exit", StringComparison.OrdinalIgnoreCase));
         }
 
-        protected async Task<bool> ConnectionInitializer()
+        protected async Task ConnectionInitializer()
         {
             // Add Progress Bar???
             string token = await authService.Login();
@@ -97,15 +67,37 @@ namespace Falcon.Client.Services
                    })
                    .WithAutomaticReconnect() // Handle it
                    .Build();
-
-                connection.StartAsync().Wait();
-                return true;
             }
             else
             {
                 Console.WriteLine("Application stopped working!");
-                return false;
             }
+            Console.Clear(); // Check it
+
+            connection.StartAsync().Wait();
+
+            connection.On("ReceiveMessage", (string userName, string message) =>
+            {
+                lock (bufferLock)
+                {
+                    // Need changes
+                    Console.CursorVisible = false;
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    try
+                    {
+                        AnsiConsole.MarkupLine
+                            ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
+                    }
+                    catch
+                    {
+                        // Needs to be beter, for example coloring
+                        Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
+                    }
+                    Console.SetCursorPosition(0, windowHeight - 1);
+                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    Console.CursorVisible = true;
+                }
+            });
         }
 
         protected async Task ChooseRoom()

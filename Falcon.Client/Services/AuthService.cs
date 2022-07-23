@@ -9,8 +9,8 @@ namespace Falcon.Client.Services
     {
         private readonly IHttpClientFactory httpClientFactory;
 
-        private static readonly string baseUrl = "https://localhost:7262";
-        //private static readonly string baseUrl = "http://192.168.1.25:5262";
+        //private static readonly string baseUrl = "https://localhost:7262";
+        private static readonly string baseUrl = "http://192.168.68.102:5262";
 
         public AuthService(IHttpClientFactory httpClientFactory)
         {
@@ -37,6 +37,7 @@ namespace Falcon.Client.Services
                     }
                 }
                 catch (Exception)
+
                 {
                     AnsiConsole.MarkupLine($"[red]Something went wrong! Try again later![/]");
                     return string.Empty;

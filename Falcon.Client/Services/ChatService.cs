@@ -11,6 +11,9 @@ namespace Falcon.Client.Services
         private readonly IAuthService authService;
         private HubConnection connection;
 
+        public static Thread t1;
+        public static Thread t2;
+
         public ChatService(IAuthService authService)
         {
             this.authService = authService;
@@ -19,7 +22,6 @@ namespace Falcon.Client.Services
         public async Task RunAsync()
         {
             await ConnectionInitializer();
-            await ChooseRoom();
             string message;
             do
             {
@@ -51,6 +53,15 @@ namespace Falcon.Client.Services
             } while (!string.Equals(message, "/exit", StringComparison.OrdinalIgnoreCase));
         }
 
+        public async Task RunChat()
+        {
+            // MultiThreading
+            t1 = new Thread(async () => await RunAsync());
+            t2 = new Thread(async () => await ConnectionInitializer());
+            t1.Start();
+            t2.Start();
+        }
+
         protected async Task ConnectionInitializer()
         {
             // Add Progress Bar???
@@ -58,8 +69,8 @@ namespace Falcon.Client.Services
             if (token.Length != 0)
             {
                 connection = new HubConnectionBuilder()
-                   //.WithUrl($"http://192.168.1.25:5262/chathub?access_token=" + token)
-                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
+                   .WithUrl($"http://192.168.68.102:5262/chathub?access_token=" + token)
+                   //.WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
@@ -76,6 +87,8 @@ namespace Falcon.Client.Services
 
             connection.StartAsync().Wait();
 
+            await ChooseRoom();
+
             connection.On("ReceiveMessage", (string userName, string message) =>
             {
                 lock (bufferLock)
@@ -85,6 +98,7 @@ namespace Falcon.Client.Services
                     Console.SetCursorPosition(0, windowHeight - 1);
                     try
                     {
+                        //WriteLineMultithread($"{userName}|{DateTime.Now:HH:mm:ss}|:{message}");
                         AnsiConsole.MarkupLine
                             ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
                     }
@@ -172,6 +186,15 @@ namespace Falcon.Client.Services
                         break;
                 }
             }
+        }
+
+        public static void WriteLineMultithread(string strt)
+        {
+            int lastx = Console.CursorLeft, lasty = Console.BufferHeight - 1;
+            Console.MoveBufferArea(0, lasty, lastx, 1, 0, lasty + 1, ' ', Console.ForegroundColor, Console.BackgroundColor);
+            Console.SetCursorPosition(0, lasty);
+            Console.WriteLine(strt);
+            Console.SetCursorPosition(lastx, lasty);
         }
     }
 }

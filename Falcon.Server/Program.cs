@@ -28,15 +28,15 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
-//builder.WebHost
-//    .UseUrls("http://192.168.1.25:5262", "https://localhost:7262", "http://localhost:5262")
-//    .ConfigureKestrel(options =>
-//    {
-//        //options.Listen(System.Net.IPAddress.Parse("192.168.1.25"), 7262);
-//        options.Listen(System.Net.IPAddress.Parse("192.168.1.25"), 5262);
-//        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 7262);
-//        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 5262);
-//    });
+builder.WebHost
+    .UseUrls("http://192.168.68.102:5262", "https://localhost:7262", "http://localhost:5262")
+    .ConfigureKestrel(options =>
+    {
+        //options.Listen(System.Net.IPAddress.Parse("192.168.68.102"), 7262);
+        options.Listen(System.Net.IPAddress.Parse("192.168.68.102"), 5262);
+        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 7262);
+        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 5262);
+    });
 
 // Logger
 builder.Logging.ClearProviders();

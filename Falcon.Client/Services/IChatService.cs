@@ -3,5 +3,7 @@
     public interface IChatService
     {
         Task RunAsync();
+
+        Task RunChat();
     }
 }

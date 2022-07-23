@@ -85,8 +85,8 @@ namespace Falcon.Server.Hubs
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
-            await Clients.Group(room).SendAsync("ReceiveMessage", falconBot,
-                $"{Context.UserIdentifier} has joined {room}");
+            //await Clients.Group(room).SendAsync("ReceiveMessage", falconBot,
+            //    $"{Context.UserIdentifier} has joined {room}");
             logger.Information("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
         }
 

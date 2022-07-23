@@ -19,9 +19,8 @@ namespace Falcon.Client.Services
             this.authService = authService;
         }
 
-        public async Task RunAsync()
+        public async Task RunChat()
         {
-            await ConnectionInitializer();
             string message;
             do
             {
@@ -53,16 +52,7 @@ namespace Falcon.Client.Services
             } while (!string.Equals(message, "/exit", StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task RunChat()
-        {
-            // MultiThreading
-            t1 = new Thread(async () => await RunAsync());
-            t2 = new Thread(async () => await ConnectionInitializer());
-            t1.Start();
-            t2.Start();
-        }
-
-        protected async Task ConnectionInitializer()
+        public async Task RunAsync()
         {
             // Add Progress Bar???
             string token = await authService.Login();
@@ -88,27 +78,35 @@ namespace Falcon.Client.Services
             connection.StartAsync().Wait();
 
             await ChooseRoom();
+            // MultiThreading
+            t1 = new Thread(async () => await RunChat());
+            t2 = new Thread(async () => await ConnectionListener());
+            t1.Start();
+            t2.Start();
+        }
 
+        protected async Task ConnectionListener()
+        {
             connection.On("ReceiveMessage", (string userName, string message) =>
             {
                 lock (bufferLock)
                 {
                     // Need changes
                     Console.CursorVisible = false;
-                    Console.SetCursorPosition(0, windowHeight - 1);
+                    //Console.SetCursorPosition(0, windowHeight - 1);
                     try
                     {
-                        //WriteLineMultithread($"{userName}|{DateTime.Now:HH:mm:ss}|:{message}");
-                        AnsiConsole.MarkupLine
-                            ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
+                        WriteLineMultithread($"{userName}|{DateTime.Now:HH:mm:ss}|:{message}");
+                        //AnsiConsole.MarkupLine
+                        //    ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
                     }
                     catch
                     {
                         // Needs to be beter, for example coloring
                         Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
                     }
-                    Console.SetCursorPosition(0, windowHeight - 1);
-                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    //Console.SetCursorPosition(0, windowHeight - 1);
+                    //AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
                     Console.CursorVisible = true;
                 }
             });
@@ -190,9 +188,18 @@ namespace Falcon.Client.Services
 
         public static void WriteLineMultithread(string strt)
         {
-            int lastx = Console.CursorLeft, lasty = Console.BufferHeight - 1;
-            Console.MoveBufferArea(0, lasty, lastx, 1, 0, lasty + 1, ' ', Console.ForegroundColor, Console.BackgroundColor);
+            int lastx = Console.CursorLeft;
+            Console.WriteLine();
+            int lasty = Console.BufferHeight - 1; // Buffer height
+            // Source width handle mulitline?
             Console.SetCursorPosition(0, lasty);
+            //Wyczyzczenie tej lini?
+            //Console.WriteConsoleOutput
+#pragma warning disable CA1416 // Validate platform compatibility
+            Console.MoveBufferArea(0, lasty - 1, lastx, 1, 0, lasty, ' ', Console.ForegroundColor, Console.BackgroundColor);
+            //Console.MoveBufferArea(0, 0, Console.BufferWidth)
+#pragma warning restore CA1416 // Validate platform compatibility
+            Console.SetCursorPosition(0, lasty - 1);
             Console.WriteLine(strt);
             Console.SetCursorPosition(lastx, lasty);
         }

@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.Services
+﻿namespace Falcon.Client.Interfaces
 {
     public interface IFalconOrchestratorService
     {

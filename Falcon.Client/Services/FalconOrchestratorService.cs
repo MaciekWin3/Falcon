@@ -1,4 +1,5 @@
 ﻿using Falcon.Client.Enums;
+using Falcon.Client.Interfaces;
 using Spectre.Console;
 
 namespace Falcon.Client.Services

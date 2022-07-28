@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using Falcon.Client.Interfaces;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
@@ -71,21 +72,24 @@ namespace Falcon.Client.Services
             }
             else
             {
-                Console.WriteLine("Application stopped working!");
+                AnsiConsole.MarkupLine("[red]Unable to connect to the server! Check your connection or try again later![/]");
+                Environment.Exit(-1);
             }
-            Console.Clear(); // Check it
 
-            connection.StartAsync().Wait();
-
-            await ChooseRoom();
-            // MultiThreading
-            t1 = new Thread(async () => await RunChat());
-            t2 = new Thread(async () => await ConnectionListener());
-            t1.Start();
-            t2.Start();
+            if (connection is not null)
+            {
+                Console.Clear();
+                connection.StartAsync().Wait();
+                await ChooseRoom();
+                // MultiThreading
+                t1 = new Thread(async () => await RunChat());
+                t2 = new Thread(() => ConnectionListener());
+                t1.Start();
+                t2.Start();
+            }
         }
 
-        protected async Task ConnectionListener()
+        protected void ConnectionListener()
         {
             connection.On("ReceiveMessage", (string userName, string message) =>
             {
@@ -93,20 +97,7 @@ namespace Falcon.Client.Services
                 {
                     // Need changes
                     Console.CursorVisible = false;
-                    //Console.SetCursorPosition(0, windowHeight - 1);
-                    try
-                    {
-                        WriteLineMultithread($"{userName}|{DateTime.Now:HH:mm:ss}|:{message}");
-                        //AnsiConsole.MarkupLine
-                        //    ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
-                    }
-                    catch
-                    {
-                        // Needs to be beter, for example coloring
-                        Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|: {message}");
-                    }
-                    //Console.SetCursorPosition(0, windowHeight - 1);
-                    //AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    WriteLineMultithread(userName, message);
                     Console.CursorVisible = true;
                 }
             });
@@ -162,6 +153,7 @@ namespace Falcon.Client.Services
             {
                 switch (command)
                 {
+                    // Check if this is working
                     case "/quit":
                         await connection.InvokeAsync("QuitRoom");
                         await ChooseRoom();
@@ -186,21 +178,27 @@ namespace Falcon.Client.Services
             }
         }
 
-        public static void WriteLineMultithread(string strt)
+        public static void WriteLineMultithread(string userName, string message)
         {
+            // Add additional checks for line wrapping
             int lastx = Console.CursorLeft;
             Console.WriteLine();
-            int lasty = Console.BufferHeight - 1; // Buffer height
+            int lasty = Console.BufferHeight - 1;
             // Source width handle mulitline?
             Console.SetCursorPosition(0, lasty);
-            //Wyczyzczenie tej lini?
-            //Console.WriteConsoleOutput
 #pragma warning disable CA1416 // Validate platform compatibility
             Console.MoveBufferArea(0, lasty - 1, lastx, 1, 0, lasty, ' ', Console.ForegroundColor, Console.BackgroundColor);
-            //Console.MoveBufferArea(0, 0, Console.BufferWidth)
 #pragma warning restore CA1416 // Validate platform compatibility
             Console.SetCursorPosition(0, lasty - 1);
-            Console.WriteLine(strt);
+            try
+            {
+                AnsiConsole.MarkupLine
+                   ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
+            }
+            catch
+            {
+                Console.WriteLine($"{userName}|{DateTime.Now:HH:mm:ss}|:{message}");
+            }
             Console.SetCursorPosition(lastx, lasty);
         }
     }

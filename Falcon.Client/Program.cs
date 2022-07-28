@@ -1,4 +1,5 @@
-﻿using Falcon.Client.Services;
+﻿using Falcon.Client.Interfaces;
+using Falcon.Client.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

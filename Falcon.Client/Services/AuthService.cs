@@ -1,4 +1,5 @@
 ﻿using Falcon.Client.DTOs;
+using Falcon.Client.Interfaces;
 using Newtonsoft.Json;
 using Spectre.Console;
 using System.Net.Http.Json;

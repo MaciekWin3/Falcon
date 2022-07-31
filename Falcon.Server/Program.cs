@@ -1,4 +1,3 @@
-using Azure.Identity;
 using Falcon.Server;
 using Falcon.Server.Features.Auth.Models;
 using Falcon.Server.Features.Messages.Repositories;
@@ -18,13 +17,6 @@ using System.Text;
 using ILogger = Serilog.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
-
-if (builder.Environment.EnvironmentName != "SwaggerBuild")
-{
-    builder.Configuration.AddAzureAppConfiguration(options => options
-        .Connect(new Uri("https://falconserver.azurewebsites.net/"), new DefaultAzureCredential())
-        .UseFeatureFlags());
-}
 
 builder.Services.AddAuthentication(
         CertificateAuthenticationDefaults.AuthenticationScheme)

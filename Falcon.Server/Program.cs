@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Security.Claims;
@@ -97,41 +96,41 @@ builder.Services.AddSingleton<IDictionary<string, UserConnection>>(x => new Dict
 builder.Services.AddSingleton<HashSet<string>>(x => new HashSet<string>() { "All", "Create new room" });
 
 // Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
-    options.SwaggerDoc("controllers", apiInfo);
-    options.SwaggerDoc("hubs", apiInfo);
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Falcon", Version = "v1" });
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
+//    options.SwaggerDoc("controllers", apiInfo);
+//    options.SwaggerDoc("hubs", apiInfo);
+//    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Falcon", Version = "v1" });
 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"JWT",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Scheme = "Bearer",
-        Type = SecuritySchemeType.Http,
-    });
+//    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        Description = @"JWT",
+//        Name = "Authorization",
+//        In = ParameterLocation.Header,
+//        Scheme = "Bearer",
+//        Type = SecuritySchemeType.Http,
+//    });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
+//    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+//    {
+//        {
+//            new OpenApiSecurityScheme
+//            {
+//                Reference = new OpenApiReference
+//                {
+//                    Type = ReferenceType.SecurityScheme,
+//                    Id = "Bearer"
+//                },
+//                Name = "Bearer",
+//                In = ParameterLocation.Header
+//            },
+//            new List<string>()
+//        }
+//    });
 
-    options.AddSignalRSwaggerGen();
-});
+//    options.AddSignalRSwaggerGen();
+//});
 
 var app = builder.Build();
 

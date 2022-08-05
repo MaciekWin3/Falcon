@@ -7,40 +7,24 @@ namespace Falcon.Server.Utils
     {
         public static string Compress(string uncompressedString)
         {
-            byte[] compressedBytes;
-
-            using (var uncompressedStream = new MemoryStream(Encoding.UTF8.GetBytes(uncompressedString)))
-            {
-                using (var compressedStream = new MemoryStream())
-                {
-                    using (var compressorStream = new DeflateStream(compressedStream, CompressionLevel.Fastest, true))
-                    {
-                        uncompressedStream.CopyTo(compressorStream);
-                    }
-                    compressedBytes = compressedStream.ToArray();
-                }
-            }
-
-            return Convert.ToBase64String(compressedBytes);
+            byte[] inputBytes = Encoding.UTF8.GetBytes(uncompressedString);
+            using var outputStream = new MemoryStream();
+            using var gZipStream = new GZipStream(outputStream, CompressionMode.Compress);
+            gZipStream.Write(inputBytes, 0, inputBytes.Length);
+            var outputBytes = outputStream.ToArray();
+            var outputStr = Encoding.UTF8.GetString(outputBytes);
+            //var outputbase64 = Convert.ToBase64String(outputBytes);
+            return outputStr;
         }
 
         public static string Decompress(string compressedString)
         {
-            byte[] decompressedBytes;
-
-            var compressedStream = new MemoryStream(Convert.FromBase64String(compressedString));
-
-            using (var decompressorStream = new DeflateStream(compressedStream, CompressionMode.Decompress))
-            {
-                using (var decompressedStream = new MemoryStream())
-                {
-                    decompressorStream.CopyTo(decompressedStream);
-
-                    decompressedBytes = decompressedStream.ToArray();
-                }
-            }
-
-            return Encoding.UTF8.GetString(decompressedBytes);
+            byte[] inputBytes = Convert.FromBase64String(compressedString);
+            using var inputStream = new MemoryStream(inputBytes);
+            using var gZipStream = new GZipStream(inputStream, CompressionMode.Decompress);
+            using var streamReader = new StreamReader(gZipStream);
+            var decompressedString = streamReader.ReadToEnd();
+            return decompressedString;
         }
     }
 }

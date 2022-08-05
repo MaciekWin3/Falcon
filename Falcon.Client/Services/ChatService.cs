@@ -82,10 +82,12 @@ namespace Falcon.Client.Services
                 connection.StartAsync().Wait();
                 await ChooseRoom();
                 // MultiThreading
-                t1 = new Thread(async () => await RunChat());
-                t2 = new Thread(() => ConnectionListener());
-                t1.Start();
-                t2.Start();
+                ConnectionListener();
+                await RunChat();
+                //t1 = new Thread(async () => await RunChat());
+                //t2 = new Thread(() => ConnectionListener());
+                //t1.Start();
+                //t2.Start();
             }
         }
 
@@ -160,7 +162,7 @@ namespace Falcon.Client.Services
                         break;
 
                     case "/users":
-                        // Needs improvemnts and move to own function
+                        // Needs improvments and move to own function
                         var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
                         var table = new Table();
                         table.AddColumn("Users");

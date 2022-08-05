@@ -1,4 +1,5 @@
-﻿using Falcon.Server.Utils;
+﻿using Bogus;
+using Falcon.Server.Utils;
 using NUnit.Framework;
 
 namespace Falcon.Server.Tests.Utils
@@ -6,15 +7,26 @@ namespace Falcon.Server.Tests.Utils
     public class StringCompressionTests
     {
         [Test]
-        public void ShouldReturnCompresedText()
+        public void ShouldReturnCompressedText()
         {
             // Arrange
             string text = "Hello, world!";
             // Act
             string compressedText = StringCompression.Compress(text);
             // Assert
-            Assert.IsTrue(true);
-            //Assert.IsTrue(text.Length > compressedText.Length);
+            Assert.IsTrue(text.Length > compressedText.Length);
+        }
+
+        [Test]
+        public void ShouldReturnCompressedTextLorem()
+        {
+            // Arrange
+            var faker = new Faker();
+            string text = string.Join(" ", faker.Lorem.Sentences(10));
+            // Act
+            string compressedText = StringCompression.Compress(text);
+            // Assert
+            Assert.IsTrue(text.Length > compressedText.Length);
         }
     }
 }

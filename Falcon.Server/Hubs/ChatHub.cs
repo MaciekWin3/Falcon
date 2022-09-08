@@ -56,7 +56,7 @@ namespace Falcon.Server.Hubs
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             //await Clients.Others.SendAsync("ReceiveMessage", userConnection.Username, message);
-            await messageService.CreateAsync(new Message { Content = message, });
+            await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
         }
 
         public async Task SendDirectMessage(string message, string recipient)

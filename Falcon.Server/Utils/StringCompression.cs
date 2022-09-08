@@ -13,8 +13,8 @@ namespace Falcon.Server.Utils
             gZipStream.Write(inputBytes, 0, inputBytes.Length);
             var outputBytes = outputStream.ToArray();
             var outputStr = Encoding.UTF8.GetString(outputBytes);
-            //var outputbase64 = Convert.ToBase64String(outputBytes);
-            return outputStr;
+            var outputbase64 = Convert.ToBase64String(outputBytes);
+            return outputbase64;
         }
 
         public static string Decompress(string compressedString)

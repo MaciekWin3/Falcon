@@ -28,5 +28,17 @@ namespace Falcon.Server.Tests.Utils
             // Assert
             Assert.IsTrue(text.Length > compressedText.Length);
         }
+
+        [Test]
+        public void ShouldDecompressCompressedString()
+        {
+            // Arrange
+            string text = "Lorem ipsum";
+            // Act
+            string compressedText = StringCompression.Compress(text);
+            string decompressedText = StringCompression.Decompress(compressedText);
+            // Assert
+            Assert.AreEqual(text, decompressedText);
+        }
     }
 }

@@ -12,7 +12,8 @@ namespace Falcon.Server.Features.Messages.Repositories
         public async Task CreateAsync(Message message)
         {
             await context.Messages.AddAsync(message);
-            await context.SaveChangesAsync();
+            var x = await context.SaveChangesAsync();
+            Console.WriteLine(x);
         }
 
         public async Task<List<Message>> GetAllAsync()

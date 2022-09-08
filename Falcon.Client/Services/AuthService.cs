@@ -1,5 +1,6 @@
 ﻿using Falcon.Client.DTOs;
 using Falcon.Client.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Spectre.Console;
 using System.Net.Http.Json;
@@ -9,13 +10,13 @@ namespace Falcon.Client.Services
     public class AuthService : IAuthService
     {
         private readonly IHttpClientFactory httpClientFactory;
+        private readonly IConfiguration configuration;
+        private static readonly string baseUrl = "https://localhost:7262";
 
-        //private static readonly string baseUrl = "https://localhost:7262";
-        private static readonly string baseUrl = "http://192.168.68.102:5262";
-
-        public AuthService(IHttpClientFactory httpClientFactory)
+        public AuthService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             this.httpClientFactory = httpClientFactory;
+            this.configuration = configuration;
         }
 
         // Add edge cases
@@ -66,6 +67,7 @@ namespace Falcon.Client.Services
         private async Task<string> Authorize(UserDTO userDTO)
         {
             var httpClient = httpClientFactory.CreateClient();
+            //var response = await httpClient.PostAsJsonAsync($"{configuration.GetValue<string>("IpAddress")}/api/auth/login", userDTO);
             var response = await httpClient.PostAsJsonAsync($"{baseUrl}/api/auth/login", userDTO);
             if (!response.IsSuccessStatusCode)
             {

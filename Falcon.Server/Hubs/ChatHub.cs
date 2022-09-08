@@ -56,7 +56,7 @@ namespace Falcon.Server.Hubs
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             //await Clients.Others.SendAsync("ReceiveMessage", userConnection.Username, message);
-            await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage, });
+            await messageService.CreateAsync(new Message { Content = message, });
         }
 
         public async Task SendDirectMessage(string message, string recipient)
@@ -68,7 +68,7 @@ namespace Falcon.Server.Hubs
                .Select(c => c.Username)
                .FirstOrDefault();
 
-            if (user == null)
+            if (user is null)
             {
                 await Clients.Caller.SendAsync("ReceiveMessage", falconBot, "User not found!");
             }

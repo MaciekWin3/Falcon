@@ -28,15 +28,14 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
-builder.WebHost
-    .UseUrls("http://192.168.68.102:5262", "https://localhost:7262", "http://localhost:5262")
-    .ConfigureKestrel(options =>
-    {
-        //options.Listen(System.Net.IPAddress.Parse("192.168.68.102"), 7262);
-        options.Listen(System.Net.IPAddress.Parse("192.168.68.102"), 5262);
-        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 7262);
-        options.Listen(System.Net.IPAddress.Parse("127.0.0.1"), 5262);
-    });
+//builder.WebHost
+//    .UseUrls(builder.Configuration["IpAddress:Address"])
+//    .ConfigureKestrel(options =>
+//    {
+//        //options.Listen(System.Net.IPAddress.Parse("192.168.68.102"), 7262);
+//        options.Listen(System.Net.IPAddress
+//            .Parse(builder.Configuration["IpAddress:Address"]), int.Parse(builder.Configuration["IpAddress:Port"]));
+//    });
 
 // Logger
 builder.Logging.ClearProviders();
@@ -47,10 +46,10 @@ builder.Logging.AddSerilog(logger);
 builder.Services.AddSingleton(logger);
 
 // Database
-builder.Services.AddDbContext<FalconDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("FalconDb"));
-});
+builder.Services.AddEntityFrameworkNpgsql()
+    .AddDbContext<FalconDbContext>(options => options
+    .UseLazyLoadingProxies()
+    .UseNpgsql(builder.Configuration.GetConnectionString("Supabase")));
 
 // Auth - checkParameters
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -145,6 +144,10 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("./swagger/hubs/swagger.json", "SignalR");
         options.RoutePrefix = string.Empty;
     });
+}
+else
+{
+    app.UseHttpsRedirection();
 }
 
 app.UseFileServer(new FileServerOptions

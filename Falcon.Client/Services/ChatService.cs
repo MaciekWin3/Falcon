@@ -1,5 +1,6 @@
 ﻿using Falcon.Client.Interfaces;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
@@ -10,14 +11,13 @@ namespace Falcon.Client.Services
         private static readonly object bufferLock = new();
         private static readonly int windowHeight = Console.BufferHeight;
         private readonly IAuthService authService;
+        private readonly IConfiguration configuration;
         private HubConnection connection;
 
-        public static Thread t1;
-        public static Thread t2;
-
-        public ChatService(IAuthService authService)
+        public ChatService(IAuthService authService, IConfiguration configuration)
         {
             this.authService = authService;
+            this.configuration = configuration;
         }
 
         public async Task RunChat()
@@ -60,8 +60,8 @@ namespace Falcon.Client.Services
             if (token.Length != 0)
             {
                 connection = new HubConnectionBuilder()
-                   .WithUrl($"http://192.168.68.102:5262/chathub?access_token=" + token)
-                   //.WithUrl($"https://localhost:7262/chathub?access_token=" + token)
+                   //.WithUrl($"http://192.168.68.102:5262/chathub?access_token=" + token)
+                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
@@ -81,13 +81,8 @@ namespace Falcon.Client.Services
                 Console.Clear();
                 connection.StartAsync().Wait();
                 await ChooseRoom();
-                // MultiThreading
                 ConnectionListener();
                 await RunChat();
-                //t1 = new Thread(async () => await RunChat());
-                //t2 = new Thread(() => ConnectionListener());
-                //t1.Start();
-                //t2.Start();
             }
         }
 

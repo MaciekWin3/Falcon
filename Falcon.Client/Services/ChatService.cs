@@ -60,8 +60,7 @@ namespace Falcon.Client.Services
             if (token.Length != 0)
             {
                 connection = new HubConnectionBuilder()
-                   //.WithUrl($"http://192.168.68.102:5262/chathub?access_token=" + token)
-                   .WithUrl($"https://localhost:7262/chathub?access_token=" + token)
+                   .WithUrl($"{configuration["ServerIp"]}chathub?access_token=" + token)
                    .ConfigureLogging(configureLogging =>
                    {
                        configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);

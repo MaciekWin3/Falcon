@@ -13,6 +13,8 @@ namespace Falcon.Client
         {
             var builder = new ConfigurationBuilder();
             BuildConfig(builder);
+            var configuration = builder.Build();
+            var x = configuration["sd"];
 
             // Disable logging
             var host = Host.CreateDefaultBuilder()
@@ -21,7 +23,10 @@ namespace Falcon.Client
                     services.AddTransient<IAuthService, AuthService>();
                     services.AddTransient<IChatService, ChatService>();
                     services.AddTransient<IFalconOrchestratorService, FalconOrchestratorService>();
-                    services.AddHttpClient();
+                    services.AddHttpClient("Server", client =>
+                    {
+                        client.BaseAddress = new Uri(configuration["ServerIp"]);
+                    });
                     services.AddLogging(builder =>
                         {
                             builder
@@ -42,7 +47,7 @@ namespace Falcon.Client
         {
             builder.SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json")
+                //.AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json")
                 .AddEnvironmentVariables();
         }
     }

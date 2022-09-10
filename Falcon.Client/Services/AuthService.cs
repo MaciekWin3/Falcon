@@ -11,7 +11,6 @@ namespace Falcon.Client.Services
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IConfiguration configuration;
-        private static readonly string baseUrl = "https://localhost:7262";
 
         public AuthService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
@@ -66,9 +65,9 @@ namespace Falcon.Client.Services
 
         private async Task<string> Authorize(UserDTO userDTO)
         {
-            var httpClient = httpClientFactory.CreateClient();
+            var httpClient = httpClientFactory.CreateClient("Server");
             //var response = await httpClient.PostAsJsonAsync($"{configuration.GetValue<string>("IpAddress")}/api/auth/login", userDTO);
-            var response = await httpClient.PostAsJsonAsync($"{baseUrl}/api/auth/login", userDTO);
+            var response = await httpClient.PostAsJsonAsync($"api/auth/login", userDTO);
             if (!response.IsSuccessStatusCode)
             {
                 return string.Empty;

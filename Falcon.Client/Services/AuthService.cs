@@ -66,7 +66,6 @@ namespace Falcon.Client.Services
         private async Task<string> Authorize(UserDTO userDTO)
         {
             var httpClient = httpClientFactory.CreateClient("Server");
-            //var response = await httpClient.PostAsJsonAsync($"{configuration.GetValue<string>("IpAddress")}/api/auth/login", userDTO);
             var response = await httpClient.PostAsJsonAsync($"api/auth/login", userDTO);
             if (!response.IsSuccessStatusCode)
             {

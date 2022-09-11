@@ -29,15 +29,19 @@ namespace Falcon.Client.Services
                 {
                     // Move to other function???
                     Console.SetCursorPosition(0, windowHeight - 1);
-                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] ");
+                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]:[/] ");
                     Console.CursorVisible = true;
                 }
                 message = Console.ReadLine();
 
-                // if else for commands
-                if (message.Length != 0)
+                if (!string.IsNullOrEmpty(message))
                 {
-                    if (message is not null && message[0] != '/')
+                    var cursorPosition = Console.GetCursorPosition();
+                    ClearCurrentConsoleLine(cursorPosition, cursorPosition.Top - 1);
+                    Console.SetCursorPosition(0, cursorPosition.Top - 1);
+                    AnsiConsole.Markup($"[fuchsia]You[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] {message}");
+                    Console.SetCursorPosition(cursorPosition.Left, cursorPosition.Top);
+                    if (message[0] != '/')
                     {
                         lock (bufferLock)
                         {
@@ -45,7 +49,7 @@ namespace Falcon.Client.Services
                             Console.CursorVisible = false;
                         }
                     }
-                    if (message[0] == '/')
+                    else
                     {
                         await ExecuteCommand(message);
                     }
@@ -174,6 +178,13 @@ namespace Falcon.Client.Services
             }
         }
 
+        public static void ClearCurrentConsoleLine((int, int) currentPosition, int lineNumber)
+        {
+            Console.SetCursorPosition(0, lineNumber);
+            Console.Write(new string(' ', Console.WindowHeight));
+            Console.SetCursorPosition(currentPosition.Item1, currentPosition.Item2); //Named tuple?
+        }
+
         public static void WriteLineMultithread(string userName, string message)
         {
             // Add additional checks for line wrapping
@@ -189,7 +200,7 @@ namespace Falcon.Client.Services
             try
             {
                 AnsiConsole.MarkupLine
-                   ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]"); // Change for deafult console
+                   ($"[lime]{userName}[/][yellow]|{DateTime.Now:HH:mm:ss}|:[/] [white]{message}[/]");
             }
             catch
             {

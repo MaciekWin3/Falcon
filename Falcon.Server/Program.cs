@@ -93,7 +93,7 @@ builder.Services.AddTransient<IMessageRepository, MessageRepository>();
 // Services
 builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(x => new Dictionary<string, UserConnection>());
-builder.Services.AddSingleton<HashSet<string>>(x => new HashSet<string>() { "All", "Create new room" });
+builder.Services.AddSingleton(x => new HashSet<string>() { "All", "Create new room" });
 
 // Swagger
 builder.Services.AddSwaggerGen(options =>

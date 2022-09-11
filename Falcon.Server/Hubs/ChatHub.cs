@@ -9,7 +9,7 @@ using ILogger = Serilog.ILogger;
 namespace Falcon.Server.Hubs
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class ChatHub : Hub
+    public class ChatHub : Hub<IChatHubClient>
     {
         private readonly string falconBot;
         private readonly IMessageService messageService;
@@ -42,7 +42,7 @@ namespace Falcon.Server.Hubs
             if (Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
                 Connections.Remove(Context.ConnectionId);
-                Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", falconBot, $"{userConnection.Username} has left");
+                Clients.Group(userConnection.Room).ReceiveMessage(falconBot, $"{userConnection.Username} has left");
             }
             logger.Information("Connection closed: {0}, user: {1}", Context.ConnectionId, Context.UserIdentifier);
             return base.OnDisconnectedAsync(exception);
@@ -52,7 +52,7 @@ namespace Falcon.Server.Hubs
         {
             if (Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
-                await Clients.OthersInGroup(userConnection.Room).SendAsync("ReceiveMessage", userConnection.Username, message);
+                await Clients.OthersInGroup(userConnection.Room).ReceiveMessage(userConnection.Username, message);
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
             //await Clients.Others.SendAsync("ReceiveMessage", userConnection.Username, message);
@@ -70,12 +70,12 @@ namespace Falcon.Server.Hubs
 
             if (user is null)
             {
-                await Clients.Caller.SendAsync("ReceiveMessage", falconBot, "User not found!");
+                await Clients.Caller.ReceiveMessage(falconBot, "User not found!");
             }
             else
             {
                 // Needs fix
-                await Clients.User(recipient).SendAsync("ReceiveMessage", userConnection.Username, $"[yellow]DM from {userConnection.Username}:{message}[/]");
+                await Clients.User(recipient).ReceiveMessage(userConnection.Username, $"[yellow]DM from {userConnection.Username}:{message}[/]");
                 string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
                 await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
             }
@@ -86,7 +86,7 @@ namespace Falcon.Server.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
             // Check if this is working
-            await Clients.Group(room).SendAsync("ReceiveMessage", falconBot,
+            await Clients.Group(room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has joined {room}");
             logger.Information("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
         }
@@ -96,7 +96,7 @@ namespace Falcon.Server.Hubs
             Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, userConnection.Room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, null);
-            await Clients.Group(userConnection.Room).SendAsync("ReceiveMessage", falconBot,
+            await Clients.Group(userConnection.Room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has left {userConnection.Room}");
             logger.Information("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
         }

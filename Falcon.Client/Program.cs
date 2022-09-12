@@ -14,7 +14,6 @@ namespace Falcon.Client
             var builder = new ConfigurationBuilder();
             BuildConfig(builder);
             var configuration = builder.Build();
-            var x = configuration["sd"];
 
             // Disable logging
             var host = Host.CreateDefaultBuilder()

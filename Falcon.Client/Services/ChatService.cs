@@ -25,7 +25,7 @@ namespace Falcon.Client.Services
             string message;
             do
             {
-                lock (bufferLock)
+                lock (bufferLock) // check if we need this lock
                 {
                     // Move to other function???
                     Console.SetCursorPosition(0, windowHeight - 1);
@@ -170,7 +170,9 @@ namespace Falcon.Client.Services
                         }
                         AnsiConsole.Write(table);
                         break;
-
+                    case "/exit":
+                        AnsiConsole.MarkupLine("[green]Exiting application...[/]");
+                        break;
                     default:
                         AnsiConsole.MarkupLine("[red]Invalid command![/]");
                         break;

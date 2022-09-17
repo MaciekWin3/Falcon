@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 using ILogger = Serilog.ILogger;
@@ -28,14 +29,16 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
-//builder.WebHost
-//    .UseUrls(builder.Configuration["IpAddress:Address"])
-//    .ConfigureKestrel(options =>
-//    {
-//        //options.Listen(System.Net.IPAddress.Parse("192.168.68.102"), 7262);
-//        options.Listen(System.Net.IPAddress
-//            .Parse(builder.Configuration["IpAddress:Address"]), int.Parse(builder.Configuration["IpAddress:Port"]));
-//    });
+builder.WebHost
+    .UseKestrel()
+    //.UseUrls("http://192.168.240.1:5262", "https://localhost:7262", "http://localhost:5262")
+    .UseContentRoot(Directory.GetCurrentDirectory())
+    .ConfigureKestrel(options =>
+    {
+        options.Listen(IPAddress
+            .Parse(builder.Configuration["IpAddress:Address"]), int.Parse(builder.Configuration["IpAddress:Port"]));
+    })
+    .UseIISIntegration();
 
 // Logger
 builder.Logging.ClearProviders();
@@ -140,14 +143,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("./swagger/controllers/swagger.json", "REST API");
-        options.SwaggerEndpoint("./swagger/hubs/swagger.json", "SignalR");
-        options.RoutePrefix = string.Empty;
+        options.SwaggerEndpoint("/swagger/controllers/swagger.json", "REST API");
+        options.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
     });
 }
 else
 {
-    app.UseHttpsRedirection();
+    //app.UseHttpsRedirection();
 }
 
 app.UseFileServer(new FileServerOptions

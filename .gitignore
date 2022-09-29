@@ -6,6 +6,7 @@
 # App settings
 appsettings.json
 appsettings.Development.json
+*.json
 
 # User-specific files
 *.rsuser

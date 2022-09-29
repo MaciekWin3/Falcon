@@ -79,17 +79,14 @@ namespace Falcon.Client.Services
                 Environment.Exit(-1);
             }
 
-            if (connection is not null)
-            {
-                Console.Clear();
-                connection.StartAsync().Wait();
-                await ChooseRoom();
-                ConnectionListener();
-                await RunChat();
-            }
+            Console.Clear();
+            connection.StartAsync().Wait();
+            await ChooseRoom();
+            ConnectionListener();
+            await RunChat();
         }
 
-        protected void ConnectionListener()
+        private void ConnectionListener()
         {
             connection.On("ReceiveMessage", (string userName, string message) =>
             {
@@ -103,7 +100,7 @@ namespace Falcon.Client.Services
             });
         }
 
-        protected async Task ChooseRoom()
+        private async Task ChooseRoom()
         {
             Console.Clear();
             Console.SetCursorPosition(0, 0);
@@ -125,7 +122,7 @@ namespace Falcon.Client.Services
             await connection.InvokeCoreAsync("JoinRoom", args: new[] { room });
         }
 
-        protected async Task CreateNewRoom()
+        private async Task CreateNewRoom()
         {
             // Need more work
             Console.Clear();

@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "signalr1": {
+      "ignored": "true",
+      "type": "signalr"
+    }
+  }
+}

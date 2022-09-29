@@ -9,10 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
 using ILogger = Serilog.ILogger;
@@ -29,16 +27,16 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
-builder.WebHost
-    .UseKestrel()
-    //.UseUrls("http://192.168.240.1:5262", "https://localhost:7262", "http://localhost:5262")
-    .UseContentRoot(Directory.GetCurrentDirectory())
-    .ConfigureKestrel(options =>
-    {
-        options.Listen(IPAddress
-            .Parse(builder.Configuration["IpAddress:Address"]), int.Parse(builder.Configuration["IpAddress:Port"]));
-    })
-    .UseIISIntegration();
+//builder.WebHost
+//    .UseKestrel()
+//    //.UseUrls("http://192.168.240.1:5262", "https://localhost:7262", "http://localhost:5262")
+//    .UseContentRoot(Directory.GetCurrentDirectory())
+//    .ConfigureKestrel(options =>
+//    {
+//        options.Listen(IPAddress
+//            .Parse(builder.Configuration["IpAddress:Address"]), int.Parse(builder.Configuration["IpAddress:Port"]));
+//    })
+//    .UseIISIntegration();
 
 // Logger
 builder.Logging.ClearProviders();
@@ -99,53 +97,53 @@ builder.Services.AddSingleton<IDictionary<string, UserConnection>>(x => new Dict
 builder.Services.AddSingleton(x => new HashSet<string>() { "All", "Create new room" });
 
 // Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
-    options.SwaggerDoc("controllers", apiInfo);
-    options.SwaggerDoc("hubs", apiInfo);
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Falcon", Version = "v1" });
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
+//    options.SwaggerDoc("controllers", apiInfo);
+//    options.SwaggerDoc("hubs", apiInfo);
+//    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Falcon", Version = "v1" });
 
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"JWT",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Scheme = "Bearer",
-        Type = SecuritySchemeType.Http,
-    });
+//    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        Description = @"JWT",
+//        Name = "Authorization",
+//        In = ParameterLocation.Header,
+//        Scheme = "Bearer",
+//        Type = SecuritySchemeType.Http,
+//    });
 
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
+//    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
+//    {
+//        {
+//            new OpenApiSecurityScheme
+//            {
+//                Reference = new OpenApiReference
+//                {
+//                    Type = ReferenceType.SecurityScheme,
+//                    Id = "Bearer"
+//                },
+//                Name = "Bearer",
+//                In = ParameterLocation.Header
+//            },
+//            new List<string>()
+//        }
+//    });
 
-    options.AddSignalRSwaggerGen();
-});
+//    options.AddSignalRSwaggerGen();
+//});
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/controllers/swagger.json", "REST API");
-        options.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
-    });
+    //app.UseSwagger();
+    //app.UseSwaggerUI(options =>
+    //{
+    //    options.SwaggerEndpoint("/swagger/controllers/swagger.json", "REST API");
+    //    options.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
+    //});
 }
 else
 {

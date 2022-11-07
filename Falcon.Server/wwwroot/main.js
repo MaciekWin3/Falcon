@@ -1,14 +1,19 @@
-﻿Vue.createApp({
-    data() {
-        return {
-            message: 'Hello Vue!',
-            number: 1,
-            stats: null
+﻿document.addEventListener('alpine:init', async () => {
+    Alpine.data('level', () => ({
+        data: {},
+        
+        async init() {
+            this.data = await this.fetchData();
+        },
+        
+        async fetchData() {
+            try {
+                let response = await fetch("https://api.github.com/repos/MaciekWin3/Falcon");
+                return await response.json();
+            }
+            catch (error) {
+                return ""; 
+            }
         }
-    },
-    mounted() {
-        fetch("https://api.github.com/repos/MaciekWin3/chess-clock-react-native")
-            .then(response => response.json())
-            .then(data => this.stats = data);
-    }
-}).mount('#app')
+    }))
+})

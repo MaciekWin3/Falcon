@@ -15,7 +15,6 @@ namespace Falcon.Client
             BuildConfig(builder);
             var configuration = builder.Build();
 
-            // Disable logging
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {

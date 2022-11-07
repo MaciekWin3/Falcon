@@ -1,136 +1,181 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Falcon</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
     <link rel="favicon" type="image/jpg" href="assets/favicon.ico" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css" />
-    <script src="https://unpkg.com/vue@3"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-</head>
-<body>
-    <div id="app">
-        <nav class="navbar is-light has-shadow" id="navbar">
-            <div class="navbar-brand">
-                <a class="navbar-item" href="">
-                    Home
-                </a>
-                <a class="navbar-item" href="">
-                    Docs
-                </a>
-            </div>
-            <div class="navbar-end">
-                <div class="navbar-menu">
-                    <div class="navbar-item">
-                        <div class="field is-grouped">
-                            <p class="control">
-                                <a class="bd-tw-button button" href="https://github.com/MaciekWin3/Falcon">
-                                    <span class="icon">
-                                        <i class="fab fa-github"></i>
-                                    </span>
-                                    <span>
-                                        Github
-                                    </span>
-                                </a>
-                            </p>
-                            <p class="control">
-                                <a class="button is-primary" href="https://github.com/jgthms/bulma/releases/download/0.9.3/bulma-0.9.3.zip">
-                                    <span class="icon">
-                                        <i class="fas fa-download"></i>
-                                    </span>
-                                    <span>Download</span>
-                                </a>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
-        <!--- Check for box box m-4 p-4 --->
-        <div class="hero">
-            <div class="m-2 p-2">
-                <h1 class="title is-1 fade">Falcon 🐦</h1>
-                <h2 class="subtitle fade">Terminal/Powershell chat application</h2>
-                <div class="tags">
-                    <div class="tags has-addons m-1">
-                        <span class="tag is-dark">.NET</span>
-                        <span class="tag is-info">6.0.3</span>
-                    </div>
-                    <div class="tags has-addons m-1">
-                        <span class="tag is-dark">build</span>
-                        <span class="tag is-success">passing</span>
-                    </div>
-                </div>
-                <div class="content">
-                    <h5>Introduction</h5>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla accumsan, metus ultrices eleifend gravida, nulla nunc varius lectus, nec rutrum justo nibh eu lectus. Ut vulputate semper dui. Fusce erat odio, sollicitudin vel erat vel, interdum mattis neque. Sub script works as well!</p>
-                    <h5>About</h5>
-                    <p>Curabitur accumsan turpis pharetra <strong>augue tincidunt</strong> blandit. Quisque condimentum maximus mi, sit amet commodo arcu rutrum id. Proin pretium urna vel cursus venenatis. Suspendisse potenti. Etiam mattis sem rhoncus lacus dapibus facilisis. Donec at dignissim dui. Ut et neque nisl.</p>
-                    <ul>
-                        <li>In fermentum leo eu lectus mollis, quis dictum mi aliquet.</li>
-                        <li>Morbi eu nulla lobortis, lobortis est in, fringilla felis.</li>
-                        <li>Aliquam nec felis in sapien venenatis viverra fermentum nec lectus.</li>
-                        <li>Ut non enim metus.</li>
-                    </ul>
-                </div>
-                <article class="message is-dark">
-                    <div class="message-body">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-                    </div>
-                </article>
-                <article class="message is-dark">
-                    <div class="message-body">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-                    </div>
-                </article>
-                <article class="message is-dark">
-                    <div class="message-body">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-                    </div>
-                </article>
-                <article class="message is-dark">
-                    <div class="message-body">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.
-                    </div>
-                </article>
-            </div>
-        </div>
-
-        <nav v-if="stats" class="level mt-2 pt-2">
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Users</p>
-                    <p class="title">3,456</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Watchers</p>
-                    <p class="title">{{stats.watchers}}</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Forks</p>
-                    <p class="title">{{stats.forks}}</p>
-                </div>
-            </div>
-            <div class="level-item has-text-centered">
-                <div>
-                    <p class="heading">Stars</p>
-                    <p class="title">{{stats.stargazers_count}}</p>
-                </div>
-            </div>
-        </nav>
-        <footer class="footer">
-            <div class="content has-text-centered">
-                <p>
-                    <strong>Falcon</strong> by Maciej Winnik. The source code is licensed
-                    <a href="https://opensource.org/licenses/GPL-3.0">GPL</a>.
-                </p>
-            </div>
-        </footer>
-    </div>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css"
+    />
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+      integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
     <script src="/main.js"></script>
-</body>
+  </head>
+  <body>
+    <nav class="navbar is-light has-shadow" id="navbar">
+      <div class="navbar-brand">
+        <a class="navbar-item" href=""> Home </a>
+        <a class="navbar-item" href=""> Docs </a>
+      </div>
+      <div class="navbar-end">
+        <div class="navbar-menu">
+          <div class="navbar-item">
+            <div class="field is-grouped">
+              <p class="control">
+                <a
+                  class="bd-tw-button button"
+                  href="https://github.com/MaciekWin3/Falcon"
+                >
+                  <span class="icon">
+                    <i class="fab fa-github"></i>
+                  </span>
+                  <span> Github </span>
+                </a>
+              </p>
+              <p class="control">
+                <a
+                  class="button is-primary"
+                  href="https://github.com/jgthms/bulma/releases/download/0.9.3/bulma-0.9.3.zip"
+                >
+                  <span class="icon">
+                    <i class="fas fa-download"></i>
+                  </span>
+                  <span>Download</span>
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div class="hero">
+      <div class="m-2 p-2">
+        <h1 class="title is-1 fade">Falcon 🐦</h1>
+        <h2 class="subtitle fade">Terminal/Powershell chat application</h2>
+        <div class="tags">
+          <div class="tags has-addons m-1">
+            <span class="tag is-dark">.NET</span>
+            <span class="tag is-info">6.0.4</span>
+          </div>
+          <div class="tags has-addons m-1">
+            <span class="tag is-dark">build</span>
+            <span class="tag is-success">passing</span>
+          </div>
+        </div>
+        <div class="content">
+          <h5>Introduction</h5>
+          <p>
+              Falcon is chat application that uses terminal as a UI.
+          </p>
+          <h5>About</h5>
+          <p>
+            Curabitur accumsan turpis pharetra
+            <strong>augue tincidunt</strong> blandit. Quisque condimentum
+            maximus mi, sit amet commodo arcu rutrum id. Proin pretium urna vel
+            cursus venenatis. Suspendisse potenti. Etiam mattis sem rhoncus
+            lacus dapibus facilisis. Donec at dignissim dui. Ut et neque nisl.
+          </p>
+          <ul>
+            <li>In fermentum leo eu lectus mollis, quis dictum mi aliquet.</li>
+            <li>Morbi eu nulla lobortis, lobortis est in, fringilla felis.</li>
+            <li>
+              Aliquam nec felis in sapien venenatis viverra fermentum nec
+              lectus.
+            </li>
+            <li>Ut non enim metus.</li>
+          </ul>
+        </div>
+        <article class="message is-dark">
+          <div class="message-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            <strong>Pellentesque risus mi</strong>, tempus quis placerat ut,
+            porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam
+            gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+            Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales,
+            arcu et sollicitudin porttitor, tortor urna tempor ligula, id
+            porttitor mi magna a neque. Donec dui urna, vehicula et sem eget,
+            facilisis sodales sem.
+          </div>
+        </article>
+        <article class="message is-dark">
+          <div class="message-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            <strong>Pellentesque risus mi</strong>, tempus quis placerat ut,
+            porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam
+            gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+            Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales,
+            arcu et sollicitudin porttitor, tortor urna tempor ligula, id
+            porttitor mi magna a neque. Donec dui urna, vehicula et sem eget,
+            facilisis sodales sem.
+          </div>
+        </article>
+        <article class="message is-dark">
+          <div class="message-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            <strong>Pellentesque risus mi</strong>, tempus quis placerat ut,
+            porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam
+            gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+            Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales,
+            arcu et sollicitudin porttitor, tortor urna tempor ligula, id
+            porttitor mi magna a neque. Donec dui urna, vehicula et sem eget,
+            facilisis sodales sem.
+          </div>
+        </article>
+        <article class="message is-dark">
+          <div class="message-body">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+            <strong>Pellentesque risus mi</strong>, tempus quis placerat ut,
+            porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam
+            gravida purus diam, et dictum <a>felis venenatis</a> efficitur.
+            Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales,
+            arcu et sollicitudin porttitor, tortor urna tempor ligula, id
+            porttitor mi magna a neque. Donec dui urna, vehicula et sem eget,
+            facilisis sodales sem.
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <nav x-data="level" class="level mt-2 pt-2">
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Users</p>
+          <p class="title">3,456</p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Watchers</p>
+          <p class="title" x-text="data.watchers"></p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Forks</p>
+          <p class="title" x-text="data.forks"></p>
+        </div>
+      </div>
+      <div class="level-item has-text-centered">
+        <div>
+          <p class="heading">Stars</p>
+          <p class="title" x-text="data.stargazers_count"></p>
+        </div>
+      </div>
+    </nav>
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>
+          <strong>Falcon</strong> by Maciej Winnik. The source code is licensed
+          <a href="https://opensource.org/licenses/GPL-3.0">GPL</a>.
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>

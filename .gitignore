@@ -7,6 +7,8 @@
 appsettings.json
 appsettings.Development.json
 *.json
+*.pubxml
+*.pubxml.user
 
 # User-specific files
 *.rsuser

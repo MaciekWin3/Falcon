@@ -1,66 +1,52 @@
 ﻿using Falcon.Client.DTOs;
-using Falcon.Client.Interfaces;
+using Falcon.Client.Windows;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Spectre.Console;
 using System.Net.Http.Json;
 
 namespace Falcon.Client.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService2
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IConfiguration configuration;
+        private readonly ChatService2 chatService;
 
-        public AuthService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public AuthService2(IHttpClientFactory httpClientFactory, IConfiguration configuration, ChatService2 chatService)
         {
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;
+            this.chatService = chatService;
         }
 
-        // Add edge cases
-        public async Task<string> Login()
+        public LoginWindow CreateLoginWindow()
         {
-            for (int i = 0; i < 3; i++)
-            {
-                var userCredentials = GetUserCredentials();
-                try
-                {
-                    var response = await Authorize(userCredentials);
-                    if (response.Length != 0) // Maybe there is a better way
-                    {
-                        AnsiConsole.MarkupLine($"[green]Login successful![/]");
-                        return response;
-                    }
-                    else
-                    {
-                        ShowErrorMessage(i);
-                    }
-                }
-                catch (Exception)
-
-                {
-                    AnsiConsole.MarkupLine($"[red]Something went wrong! Try again later![/]");
-                    return string.Empty;
-                }
-            }
-            return string.Empty;
+            return new LoginWindow();
         }
 
-        private static UserDTO GetUserCredentials()
+        public async Task<string> Login(string username, string password)
         {
-            var username = AnsiConsole.Ask<string>("Username: ");
-            var password = AnsiConsole.Prompt(
-                new TextPrompt<string>("Password: ")
-                    .Secret());
-
-            var userDTO = new UserDTO()
+            var userCredentials = new UserDTO()
             {
                 Username = username,
                 Password = password
             };
-
-            return userDTO;
+            try
+            {
+                var response = await Authorize(userCredentials);
+                if (response.Length != 0)
+                {
+                    return response;
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            catch (Exception)
+            {
+                return string.Empty;
+            }
         }
 
         private async Task<string> Authorize(UserDTO userDTO)
@@ -71,23 +57,11 @@ namespace Falcon.Client.Services
             {
                 return string.Empty;
             }
+
             var jsonString = await response.Content.ReadAsStringAsync();
             var tokenDTO = JsonConvert.DeserializeObject<TokenDTO>(jsonString);
             var token = tokenDTO.Token;
             return token;
-        }
-
-        private static void ShowErrorMessage(int tryNumber)
-        {
-            if (tryNumber == 2)
-            {
-                AnsiConsole.MarkupLine($"[red]You entered wrong credentials three times. Application will quit![/]");
-                Environment.Exit(-1);
-            }
-            else
-            {
-                AnsiConsole.MarkupLine($"[magenta]Wrong credentials! Try again![/]");
-            }
         }
     }
 }

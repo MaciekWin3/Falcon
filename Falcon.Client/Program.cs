@@ -1,5 +1,7 @@
 ﻿using Falcon.Client.Interfaces;
 using Falcon.Client.Services;
+using Falcon.Client.Terminal;
+using Falcon.Client.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,13 +20,27 @@ namespace Falcon.Client
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
+                    // Obsolete Services
                     services.AddTransient<IAuthService, AuthService>();
                     services.AddTransient<IChatService, ChatService>();
                     services.AddTransient<IFalconOrchestratorService, FalconOrchestratorService>();
+
+                    // Services
+                    services.AddScoped<SignalRClient>();
+                    services.AddTransient<ChatService2>();
+                    services.AddTransient<AuthService2>();
+                    services.AddTransient<ITerminalOrchestrator, TerminalOrchestrator>();
+
+                    // Windows
+                    services.AddTransient<ChatWindow>();
+                    services.AddTransient<LoginWindow>();
+                    services.AddTransient<RoomWindow>();
+
                     services.AddHttpClient("Server", client =>
                     {
                         client.BaseAddress = new Uri(configuration["ServerIp"]);
                     });
+                    // Do we need this?
                     services.AddLogging(builder =>
                         {
                             builder
@@ -37,8 +53,9 @@ namespace Falcon.Client
                 })
                 .Build();
 
-            var svc = ActivatorUtilities.CreateInstance<FalconOrchestratorService>(host.Services);
-            await svc.DisplayMenu();
+            var svc = ActivatorUtilities.CreateInstance<TerminalOrchestrator>(host.Services);
+            // Added await
+            await svc.Run();
         }
 
         private static void BuildConfig(IConfigurationBuilder builder)

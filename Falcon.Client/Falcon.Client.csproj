@@ -20,6 +20,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="5.0.1" />
     <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="Terminal.Gui" Version="1.8.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Helpers\" />
     <Folder Include="Utils\" />
   </ItemGroup>
 

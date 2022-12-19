@@ -55,7 +55,7 @@ namespace Falcon.Server.Hubs
                 await Clients.OthersInGroup(userConnection.Room).ReceiveMessage(userConnection.Username, message);
             }
             string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
-            //await Clients.Others.SendAsync("ReceiveMessage", userConnection.Username, message);
+            //await Clients.Others.ReceiveMessage(userConnection.Username, message);
             await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
         }
 

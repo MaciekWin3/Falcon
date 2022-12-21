@@ -36,6 +36,7 @@
   <ItemGroup>
     <Folder Include="Data\Messages\" />
     <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\assets\" />
   </ItemGroup>
 
 </Project>

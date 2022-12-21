@@ -6,10 +6,11 @@ namespace Falcon.Client.Windows
 {
     public class ChatWindow : Window
     {
-        private static string _username = "User";
+        private string _username = "User";
         private static readonly List<string> users = new List<string>();
         private static readonly List<string> messages = new List<string>();
         private static ListView chatView;
+        private static ListView userList;
 
         public Action OnQuit { get; set; }
 
@@ -25,7 +26,7 @@ namespace Falcon.Client.Windows
         {
             this.signalRClient = signalRClient;
             X = 0;
-            Y = 0;
+            Y = 1;
             Width = Dim.Fill();
             Height = Dim.Fill();
             Setup("Chat");
@@ -55,6 +56,17 @@ namespace Falcon.Client.Windows
             chatView.ScrollUp(h - 1);
         }
 
+        public MenuBar CreateMenuBar()
+        {
+            return new MenuBar(new MenuBarItem[]
+            {
+                new MenuBarItem("App", new MenuItem []
+                {
+                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                })
+            });
+        }
+
         public void ExecuteCommand()
         {
             throw new NotImplementedException();
@@ -65,7 +77,7 @@ namespace Falcon.Client.Windows
             var chatViewFrame = new FrameView(text)
             {
                 X = 0,
-                Y = 1,
+                Y = 0,
                 Width = Dim.Percent(75),
                 Height = Dim.Percent(80),
             };
@@ -73,7 +85,7 @@ namespace Falcon.Client.Windows
             chatView = new ListView
             {
                 X = 0,
-                Y = 2,
+                Y = 0,
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
                 CanFocus = false
@@ -81,23 +93,14 @@ namespace Falcon.Client.Windows
             chatViewFrame.Add(chatView);
             Add(chatViewFrame);
 
-            var menuBar = new MenuBar(new MenuBarItem[]
-            {
-                new MenuBarItem("App", new MenuItem []
-                {
-                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
-                })
-            });
-            Add(menuBar);
-
             var userListFrame = new FrameView("Online Users")
             {
                 X = Pos.Right(chatViewFrame),
-                Y = 1,
+                Y = 0,
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
             };
-            var userList = new ScrollView()
+            userList = new ListView()
             {
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
@@ -121,6 +124,11 @@ namespace Falcon.Client.Windows
                 Width = Dim.Fill(),
                 Height = Dim.Fill()
             };
+
+            // Test
+            users.Add(_username);
+            users.Add("Konrad");
+            userList.SetSource(users);
 
             KeyDown += (a) =>
             {

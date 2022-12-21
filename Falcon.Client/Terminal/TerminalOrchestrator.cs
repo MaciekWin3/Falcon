@@ -41,7 +41,6 @@ namespace Falcon.Client.Terminal
         private async Task ShowLoginWindow()
         {
             var top = Application.Top;
-            // var win = authService.CreateLoginWindow();
             var win = new LoginWindow
             {
                 OnAuthorize = async (authData) =>
@@ -54,7 +53,6 @@ namespace Falcon.Client.Terminal
                     // Todo: delete
                     // await chatService.RunAsync(token);
                     await signalRClient.StartConnectionAsync(token);
-                    parameters.Add("token", token);
                     Application.MainLoop.Invoke(() =>
                     {
                         running = ShowRoomWindow;
@@ -67,9 +65,16 @@ namespace Falcon.Client.Terminal
                     running = null;
                     top.Running = false;
                 },
+
+                OnQuit = () =>
+                {
+                    running = null;
+                    Application.RequestStop();
+                },
             };
 
             top.Add(win);
+            top.Add(win.CreateMenuBar());
             Application.Run();
         }
 
@@ -83,6 +88,7 @@ namespace Falcon.Client.Terminal
                 Application.RequestStop();
             };
             top.Add(win);
+            top.Add(win.CreateMenuBar());
             Application.Run();
             // Handle error
         }

@@ -7,18 +7,38 @@ namespace Falcon.Client.Windows
         public Func<(string name, string password), Task<string>> OnAuthorize { get; set; }
         public Action<string> OnLogin { get; set; }
         public Action OnExit { get; set; }
+        public Action OnQuit { get; set; }
 
         public LoginWindow() : base("Login")
         {
             X = Pos.Center();
-            Y = Pos.Center();
+            Y = 1;
             Width = Dim.Percent(100);
             Height = Dim.Percent(100);
             Setup();
         }
 
+        public MenuBar CreateMenuBar()
+        {
+            return new MenuBar(new MenuBarItem[]
+            {
+                new MenuBarItem("App", new MenuItem []
+                {
+                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                })
+            });
+        }
+
         public void Setup()
         {
+            var menuBar = new MenuBar(new MenuBarItem[]
+            {
+                new MenuBarItem("App", new MenuItem []
+                {
+                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                })
+            });
+            //Add(menuBar);
             var nameLabel = new Label(0, 1, "Nickname");
             var nameText = new TextField("")
             {

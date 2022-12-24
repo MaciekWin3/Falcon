@@ -5,14 +5,14 @@ using Spectre.Console;
 
 namespace Falcon.Client.Services
 {
-    public class ChatService2
+    public class ChatService
     {
         private static readonly object bufferLock = new();
         private readonly IConfiguration configuration;
         private readonly SignalRClient signalRClient;
         private HubConnection connection;
 
-        public ChatService2(IConfiguration configuration, SignalRClient signalRClient)
+        public ChatService(IConfiguration configuration, SignalRClient signalRClient)
         {
             this.configuration = configuration;
             this.signalRClient = signalRClient;

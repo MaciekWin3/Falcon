@@ -31,14 +31,6 @@ namespace Falcon.Client.Windows
 
         public void Setup()
         {
-            var menuBar = new MenuBar(new MenuBarItem[]
-            {
-                new MenuBarItem("App", new MenuItem []
-                {
-                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
-                })
-            });
-            //Add(menuBar);
             var nameLabel = new Label(0, 1, "Nickname");
             var nameText = new TextField("")
             {

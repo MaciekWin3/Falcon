@@ -7,6 +7,7 @@ namespace Falcon.Client.Windows
         public ListView RoomListView;
         private readonly IList<string> rooms;
         public Action<string> OnChatOpen { get; set; }
+        public Action OnQuit { get; set; }
 
         public RoomWindow(IList<string> rooms) : base("Choose Room")
         {
@@ -32,6 +33,17 @@ namespace Falcon.Client.Windows
 
             RoomListView.OpenSelectedItem += OpenChat;
             Add(RoomListView);
+        }
+
+        public MenuBar CreateMenuBar()
+        {
+            return new MenuBar(new MenuBarItem[]
+            {
+                new MenuBarItem("App", new MenuItem []
+                {
+                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                })
+            });
         }
 
         public void OpenChat(EventArgs e)

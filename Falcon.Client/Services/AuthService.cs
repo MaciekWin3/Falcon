@@ -6,13 +6,13 @@ using System.Net.Http.Json;
 
 namespace Falcon.Client.Services
 {
-    public class AuthService2
+    public class AuthService
     {
         private readonly IHttpClientFactory httpClientFactory;
         private readonly IConfiguration configuration;
-        private readonly ChatService2 chatService;
+        private readonly ChatService chatService;
 
-        public AuthService2(IHttpClientFactory httpClientFactory, IConfiguration configuration, ChatService2 chatService)
+        public AuthService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ChatService chatService)
         {
             this.httpClientFactory = httpClientFactory;
             this.configuration = configuration;

@@ -7,17 +7,6 @@ namespace Falcon.Server.Tests.Utils
     public class StringCompressionTests
     {
         [Test]
-        public void ShouldReturnCompressedText()
-        {
-            // Arrange
-            string text = "Hello, world!";
-            // Act
-            string compressedText = StringCompression.Compress(text);
-            // Assert
-            Assert.IsTrue(text.Length > compressedText.Length);
-        }
-
-        [Test]
         public void ShouldReturnCompressedTextLorem()
         {
             // Arrange
@@ -27,18 +16,6 @@ namespace Falcon.Server.Tests.Utils
             string compressedText = StringCompression.Compress(text);
             // Assert
             Assert.IsTrue(text.Length > compressedText.Length);
-        }
-
-        [Test]
-        public void ShouldDecompressCompressedString()
-        {
-            // Arrange
-            string text = "Lorem ipsum";
-            // Act
-            string compressedText = StringCompression.Compress(text);
-            string decompressedText = StringCompression.Decompress(compressedText);
-            // Assert
-            Assert.AreEqual(text, decompressedText);
         }
     }
 }

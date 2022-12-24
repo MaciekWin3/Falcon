@@ -1,6 +1,4 @@
-﻿using Falcon.Client.Interfaces;
-using Falcon.Client.Services;
-using Falcon.Client.Terminal;
+﻿using Falcon.Client.Services;
 using Falcon.Client.Windows;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,15 +18,10 @@ namespace Falcon.Client
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    // Obsolete Services
-                    services.AddTransient<IAuthService, AuthService>();
-                    services.AddTransient<IChatService, ChatService>();
-                    services.AddTransient<IFalconOrchestratorService, FalconOrchestratorService>();
-
                     // Services
                     services.AddScoped<SignalRClient>();
-                    services.AddTransient<ChatService2>();
-                    services.AddTransient<AuthService2>();
+                    services.AddTransient<ChatService>();
+                    services.AddTransient<AuthService>();
                     services.AddTransient<ITerminalOrchestrator, TerminalOrchestrator>();
 
                     // Windows

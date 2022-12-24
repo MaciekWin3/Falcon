@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Terminal.Gui;
 
+//using Attribute = Terminal.Gui.Attribute;
+
 namespace Falcon.Client.Windows
 {
     public class ChatWindow : Window
@@ -9,7 +11,7 @@ namespace Falcon.Client.Windows
         private string _username = "User";
         private static readonly List<string> users = new List<string>();
         private static readonly List<string> messages = new List<string>();
-        private static ListView chatView;
+        private static ListView chatListView;
         private static ListView userList;
 
         public Action OnQuit { get; set; }
@@ -50,10 +52,10 @@ namespace Falcon.Client.Windows
         private static void ConnectionLister(string userName, string message)
         {
             messages.Add($"{userName}: {message}");
-            chatView.SetSource(messages);
-            chatView.MoveEnd();
-            chatView.GetCurrentHeight(out int h);
-            chatView.ScrollUp(h - 1);
+            chatListView.SetSource(messages);
+            chatListView.MoveEnd();
+            chatListView.GetCurrentHeight(out int h);
+            chatListView.ScrollUp(h - 1);
         }
 
         public MenuBar CreateMenuBar()
@@ -62,7 +64,7 @@ namespace Falcon.Client.Windows
             {
                 new MenuBarItem("App", new MenuItem []
                 {
-                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.CtrlMask | Key.Q)
                 })
             });
         }
@@ -70,6 +72,11 @@ namespace Falcon.Client.Windows
         public void ExecuteCommand()
         {
             throw new NotImplementedException();
+        }
+
+        private void chatListViewRender(ListViewRowEventArgs obj)
+        {
+            //obj.RowAttribute = new Attribute(Color.BrightMagenta, Color.Green);
         }
 
         public void Setup(string text)
@@ -82,7 +89,7 @@ namespace Falcon.Client.Windows
                 Height = Dim.Percent(80),
             };
 
-            chatView = new ListView
+            chatListView = new ListView
             {
                 X = 0,
                 Y = 0,
@@ -90,7 +97,9 @@ namespace Falcon.Client.Windows
                 Height = Dim.Fill(),
                 CanFocus = false
             };
-            chatViewFrame.Add(chatView);
+            chatListView.RowRender += chatListViewRender;
+
+            chatViewFrame.Add(chatListView);
             Add(chatViewFrame);
 
             var userListFrame = new FrameView("Online Users")
@@ -137,11 +146,11 @@ namespace Falcon.Client.Windows
                     string message = chatMessage.Text.ToString();
                     messages.Add($"{_username}: {message}");
                     signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
-                    chatView.SetSource(messages);
+                    chatListView.SetSource(messages);
                     chatMessage.Text = string.Empty;
-                    chatView.MoveEnd();
-                    chatView.GetCurrentHeight(out int h);
-                    chatView.ScrollUp(h - 1);
+                    chatListView.MoveEnd();
+                    chatListView.GetCurrentHeight(out int h);
+                    chatListView.ScrollUp(h - 1);
                 }
             };
             chatBar.Add(chatMessage);

@@ -4,18 +4,18 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Terminal.Gui;
 
-namespace Falcon.Client.Terminal
+namespace Falcon.Client
 {
     internal class TerminalOrchestrator : ITerminalOrchestrator
     {
         private Func<Task> running;
-        private readonly ChatService2 chatService;
-        private readonly AuthService2 authService;
+        private readonly ChatService chatService;
+        private readonly AuthService authService;
         private readonly SignalRClient signalRClient;
         private readonly IServiceProvider serviceProvider;
         private static Dictionary<string, string> parameters { get; set; }
 
-        public TerminalOrchestrator(ChatService2 chatService, AuthService2 authService,
+        public TerminalOrchestrator(ChatService chatService, AuthService authService,
             SignalRClient signalRClient, IServiceProvider serviceProvider)
         {
             running = ShowLoginWindow;
@@ -63,7 +63,8 @@ namespace Falcon.Client.Terminal
                 OnExit = () =>
                 {
                     running = null;
-                    top.Running = false;
+                    //top.Running = false;
+                    Application.RequestStop();
                 },
 
                 OnQuit = () =>
@@ -85,6 +86,7 @@ namespace Falcon.Client.Terminal
             win.OnQuit = () =>
             {
                 running = null;
+                //top.Running = false;
                 Application.RequestStop();
             };
             top.Add(win);
@@ -116,9 +118,16 @@ namespace Falcon.Client.Terminal
                             running = ShowChatWindow;
                             Application.RequestStop();
                         });
+                    },
+
+                    OnQuit = () =>
+                    {
+                        running = null;
+                        Application.RequestStop();
                     }
                 };
                 top.Add(win);
+                top.Add(win.CreateMenuBar());
             });
             Application.Run();
         }

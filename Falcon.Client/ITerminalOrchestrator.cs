@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.Terminal
+﻿namespace Falcon.Client
 {
     internal interface ITerminalOrchestrator
     {

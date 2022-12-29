@@ -1,8 +1,10 @@
 ﻿using Falcon.Server.Utils;
+using FluentAssertions;
 using NUnit.Framework;
 
 namespace Falcon.Server.Tests.Utils
 {
+    [TestFixture]
     public class CryptographyTests
     {
         private const int CRYPTOGRAPHY_KEY = 10;
@@ -15,9 +17,10 @@ namespace Falcon.Server.Tests.Utils
             // Act
             string encryptedText = Cryptography.EncryptDecrypt(text, CRYPTOGRAPHY_KEY);
             string decryptedText = Cryptography.EncryptDecrypt(encryptedText, CRYPTOGRAPHY_KEY);
+
             // Assert
-            Assert.AreNotEqual(encryptedText, decryptedText);
-            Assert.AreEqual(text, decryptedText);
+            encryptedText.Should().NotBe(decryptedText);
+            text.Should().Be(decryptedText);
         }
     }
 }

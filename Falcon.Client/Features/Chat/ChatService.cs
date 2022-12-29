@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using Falcon.Client.Features.SignalR;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Spectre.Console;
 
-namespace Falcon.Client.Services
+namespace Falcon.Client.Features.Chat
 {
     public class ChatService
     {

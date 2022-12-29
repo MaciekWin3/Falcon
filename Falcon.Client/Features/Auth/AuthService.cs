@@ -1,10 +1,11 @@
-﻿using Falcon.Client.DTOs;
-using Falcon.Client.Windows;
+﻿using Falcon.Client.Features.Auth.DTOs;
+using Falcon.Client.Features.Auth.UI;
+using Falcon.Client.Features.Chat;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 
-namespace Falcon.Client.Services
+namespace Falcon.Client.Features.Auth
 {
     public class AuthService
     {

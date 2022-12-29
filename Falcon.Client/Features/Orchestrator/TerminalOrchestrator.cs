@@ -1,12 +1,16 @@
-﻿using Falcon.Client.Services;
-using Falcon.Client.Windows;
+﻿using Falcon.Client.Features.Auth;
+using Falcon.Client.Features.Auth.UI;
+using Falcon.Client.Features.Chat;
+using Falcon.Client.Features.Chat.UI;
+using Falcon.Client.Features.Lobby.UI;
+using Falcon.Client.Features.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Terminal.Gui;
 
 namespace Falcon.Client
 {
-    internal class TerminalOrchestrator : ITerminalOrchestrator
+    internal class TerminalOrchestrator
     {
         private Func<Task> running;
         private readonly ChatService chatService;
@@ -29,7 +33,7 @@ namespace Falcon.Client
         public async Task Run()
         {
             Application.Init();
-            //Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightBlue, Color.Black);
+            Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
             Console.OutputEncoding = System.Text.Encoding.Default;
             while (running != null)
             {
@@ -38,7 +42,7 @@ namespace Falcon.Client
             Application.Shutdown();
         }
 
-        private async Task ShowLoginWindow()
+        private Task ShowLoginWindow()
         {
             var top = Application.Top;
             var win = new LoginWindow
@@ -77,9 +81,10 @@ namespace Falcon.Client
             top.Add(win);
             top.Add(win.CreateMenuBar());
             Application.Run();
+            return Task.CompletedTask;
         }
 
-        private async Task ShowChatWindow()
+        private Task ShowChatWindow()
         {
             var top = Application.Top;
             var win = serviceProvider.GetService<ChatWindow>();
@@ -92,10 +97,10 @@ namespace Falcon.Client
             top.Add(win);
             top.Add(win.CreateMenuBar());
             Application.Run();
-            // Handle error
+            return Task.CompletedTask;
         }
 
-        private async Task ShowRoomWindow()
+        private Task ShowRoomWindow()
         {
             // Sprawdzić synchroniczną metode
             var top = Application.Top;
@@ -103,7 +108,7 @@ namespace Falcon.Client
             {
                 IList<string> rooms = new List<string>();
                 rooms = await chatService.GetListOfRoomAsync();
-                var win = new RoomWindow(rooms)
+                var win = new LobbyWindow(rooms)
                 {
                     OnChatOpen = async (room) =>
                     {
@@ -130,6 +135,7 @@ namespace Falcon.Client
                 top.Add(win.CreateMenuBar());
             });
             Application.Run();
+            return Task.CompletedTask;
         }
     }
 }

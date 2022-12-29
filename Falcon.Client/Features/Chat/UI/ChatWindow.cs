@@ -1,10 +1,10 @@
-﻿using Falcon.Client.Services;
+﻿using Falcon.Client.Features.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Terminal.Gui;
 
 //using Attribute = Terminal.Gui.Attribute;
 
-namespace Falcon.Client.Windows
+namespace Falcon.Client.Features.Chat.UI
 {
     public class ChatWindow : Window
     {
@@ -21,8 +21,6 @@ namespace Falcon.Client.Windows
 
         // SignalR
         private static readonly object mutex = new();
-
-        private static Thread main;
 
         public ChatWindow(SignalRClient signalRClient) : base("Falcon")
         {

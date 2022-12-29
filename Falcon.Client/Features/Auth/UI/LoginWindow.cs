@@ -1,6 +1,6 @@
 ﻿using Terminal.Gui;
 
-namespace Falcon.Client.Windows
+namespace Falcon.Client.Features.Auth.UI
 {
     public class LoginWindow : Window
     {
@@ -13,8 +13,8 @@ namespace Falcon.Client.Windows
         {
             X = Pos.Center();
             Y = 1;
-            Width = Dim.Percent(100);
-            Height = Dim.Percent(100);
+            Width = Dim.Fill();
+            Height = Dim.Fill();
             Setup();
         }
 

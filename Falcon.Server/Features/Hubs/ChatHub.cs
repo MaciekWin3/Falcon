@@ -54,7 +54,7 @@ namespace Falcon.Server.Hubs
             {
                 await Clients.OthersInGroup(userConnection.Room).ReceiveMessage(userConnection.Username, message);
             }
-            string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
+            string encryptedAndCompressedMessage = EncryptMessage(message);
             //await Clients.Others.ReceiveMessage(userConnection.Username, message);
             await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
         }
@@ -76,7 +76,7 @@ namespace Falcon.Server.Hubs
             {
                 // Needs fix
                 await Clients.User(recipient).ReceiveMessage(userConnection.Username, $"[yellow]DM from {userConnection.Username}:{message}[/]");
-                string encryptedAndCompressedMessage = CompressAndEncryptMessage(message);
+                string encryptedAndCompressedMessage = EncryptMessage(message);
                 await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
             }
         }
@@ -134,9 +134,8 @@ namespace Falcon.Server.Hubs
             return userConnection.Room;
         }
 
-        private string CompressAndEncryptMessage(string message)
+        private string EncryptMessage(string message)
         {
-            message = StringCompression.Compress(message);
             message = Cryptography.EncryptDecrypt(message, int.Parse(configuration["Encryption:Key"]));
             return message;
         }

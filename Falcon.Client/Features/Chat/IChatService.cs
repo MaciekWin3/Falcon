@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.Interfaces
+﻿namespace Falcon.Client.Features.Chat
 {
     public interface IChatService
     {

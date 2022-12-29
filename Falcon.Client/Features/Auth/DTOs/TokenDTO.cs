@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.DTOs
+﻿namespace Falcon.Client.Features.Auth.DTOs
 {
     public class TokenDTO
     {

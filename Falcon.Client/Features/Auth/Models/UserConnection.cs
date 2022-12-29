@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.Models
+﻿namespace Falcon.Client.Features.Auth.Models
 {
     public class UserConnection
     {

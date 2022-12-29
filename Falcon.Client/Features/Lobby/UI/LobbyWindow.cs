@@ -1,20 +1,20 @@
 ﻿using Terminal.Gui;
 
-namespace Falcon.Client.Windows
+namespace Falcon.Client.Features.Lobby.UI
 {
-    public class RoomWindow : Window
+    public class LobbyWindow : Window
     {
         public ListView RoomListView;
         private readonly IList<string> rooms;
         public Action<string> OnChatOpen { get; set; }
         public Action OnQuit { get; set; }
 
-        public RoomWindow(IList<string> rooms) : base("Choose Room")
+        public LobbyWindow(IList<string> rooms) : base("Choose Room")
         {
-            X = Pos.Center();
-            Y = Pos.Center();
-            Width = Dim.Percent(100);
-            Height = Dim.Percent(100);
+            X = 0;
+            Y = 1;
+            Width = Dim.Fill();
+            Height = Dim.Fill();
             this.rooms = rooms;
             Setup();
         }
@@ -24,7 +24,7 @@ namespace Falcon.Client.Windows
             RoomListView = new ListView(rooms.ToList())
             {
                 X = 0,
-                Y = 0,
+                Y = 1,
                 Width = Dim.Fill(0),
                 Height = Dim.Fill(0),
                 AllowsMarking = false,

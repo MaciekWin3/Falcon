@@ -27,16 +27,6 @@ builder.Services.AddCors();
 builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
-//builder.WebHost
-//    .UseKestrel()
-//    //.UseUrls("http://192.168.240.1:5262", "https://localhost:7262", "http://localhost:5262")
-//    .UseContentRoot(Directory.GetCurrentDirectory())
-//    .ConfigureKestrel(options =>
-//    {
-//        options.Listen(IPAddress
-//            .Parse(builder.Configuration["IpAddress:Address"]), int.Parse(builder.Configuration["IpAddress:Port"]));
-//    })
-//    .UseIISIntegration();
 
 // Logger
 builder.Logging.ClearProviders();

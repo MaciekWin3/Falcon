@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.Interfaces.SignalRClients
+﻿namespace Falcon.Client.Features.Chat
 {
     public interface IChatHubClient
     {

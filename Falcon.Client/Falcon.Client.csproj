@@ -29,10 +29,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Helpers\" />
-    <Folder Include="Terminal\" />
-    <Folder Include="Utils\" />
-  </ItemGroup>
-
 </Project>

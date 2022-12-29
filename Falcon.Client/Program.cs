@@ -1,5 +1,9 @@
-﻿using Falcon.Client.Services;
-using Falcon.Client.Windows;
+﻿using Falcon.Client.Features.Auth;
+using Falcon.Client.Features.Auth.UI;
+using Falcon.Client.Features.Chat;
+using Falcon.Client.Features.Chat.UI;
+using Falcon.Client.Features.Lobby.UI;
+using Falcon.Client.Features.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -22,12 +26,12 @@ namespace Falcon.Client
                     services.AddScoped<SignalRClient>();
                     services.AddTransient<ChatService>();
                     services.AddTransient<AuthService>();
-                    services.AddTransient<ITerminalOrchestrator, TerminalOrchestrator>();
+                    services.AddTransient<TerminalOrchestrator>();
 
                     // Windows
                     services.AddTransient<ChatWindow>();
                     services.AddTransient<LoginWindow>();
-                    services.AddTransient<RoomWindow>();
+                    services.AddTransient<LobbyWindow>();
 
                     services.AddHttpClient("Server", client =>
                     {

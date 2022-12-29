@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Falcon.Client.Services
+namespace Falcon.Client.Features.SignalR
 {
-    public class SignalRClient
+    public class SignalRClient : ISignalRClient
     {
         public HubConnection connection;
         private readonly IConfiguration configuration;

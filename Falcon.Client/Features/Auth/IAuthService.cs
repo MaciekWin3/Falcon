@@ -1,4 +1,4 @@
-﻿namespace Falcon.Client.Interfaces
+﻿namespace Falcon.Client.Features.Auth
 {
     public interface IAuthService
     {

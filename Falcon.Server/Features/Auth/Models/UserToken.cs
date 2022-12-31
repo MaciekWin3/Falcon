@@ -7,7 +7,7 @@ namespace Falcon.Server.Features.Auth.Models
 {
     public class UserToken
     {
-        public string Token { get; protected set; }
+        public string Value { get; protected set; }
         public DateTime Expiration { get; protected set; }
 
         public UserToken(string userName, string configurationKey)
@@ -35,7 +35,7 @@ namespace Falcon.Server.Features.Auth.Models
                signingCredentials: creds
             );
 
-            Token = new JwtSecurityTokenHandler().WriteToken(token);
+            Value = new JwtSecurityTokenHandler().WriteToken(token);
             Expiration = expiration;
         }
     }

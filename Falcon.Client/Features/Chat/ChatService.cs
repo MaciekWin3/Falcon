@@ -8,7 +8,6 @@ namespace Falcon.Client.Features.Chat
 {
     public class ChatService
     {
-        private static readonly object bufferLock = new();
         private readonly IConfiguration configuration;
         private readonly SignalRClient signalRClient;
         private HubConnection connection;
@@ -46,7 +45,7 @@ namespace Falcon.Client.Features.Chat
             return await signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveRooms");
         }
 
-        public async Task CheckForCommand(string message)
+        public async Task CheckForCommandAsync(string message)
         {
             if (!message.StartsWith('/'))
             {

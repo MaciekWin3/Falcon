@@ -1,7 +1,9 @@
-﻿namespace Falcon.Client.Features.Auth
+﻿using Falcon.Client.Features.Auth.Models;
+
+namespace Falcon.Client.Features.Auth
 {
     public interface IAuthService
     {
-        Task<string> Login();
+        Task<string> LoginAsync(User user);
     }
 }

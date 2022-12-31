@@ -1,23 +1,17 @@
-﻿using Falcon.Client.Features.Auth.DTOs;
+﻿using Falcon.Client.Features.Auth.Models;
 using Falcon.Client.Features.Auth.UI;
-using Falcon.Client.Features.Chat;
-using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 
 namespace Falcon.Client.Features.Auth
 {
-    public class AuthService
+    public class AuthService : IAuthService
     {
         private readonly IHttpClientFactory httpClientFactory;
-        private readonly IConfiguration configuration;
-        private readonly ChatService chatService;
 
-        public AuthService(IHttpClientFactory httpClientFactory, IConfiguration configuration, ChatService chatService)
+        public AuthService(IHttpClientFactory httpClientFactory)
         {
             this.httpClientFactory = httpClientFactory;
-            this.configuration = configuration;
-            this.chatService = chatService;
         }
 
         public LoginWindow CreateLoginWindow()
@@ -25,16 +19,11 @@ namespace Falcon.Client.Features.Auth
             return new LoginWindow();
         }
 
-        public async Task<string> Login(string username, string password)
+        public async Task<string> LoginAsync(User user)
         {
-            var userCredentials = new UserDTO()
-            {
-                Username = username,
-                Password = password
-            };
             try
             {
-                var response = await Authorize(userCredentials);
+                var response = await AuthorizeAsync(user);
                 if (response.Length != 0)
                 {
                     return response;
@@ -50,19 +39,24 @@ namespace Falcon.Client.Features.Auth
             }
         }
 
-        private async Task<string> Authorize(UserDTO userDTO)
+        private async Task<string> AuthorizeAsync(User user)
         {
             var httpClient = httpClientFactory.CreateClient("Server");
-            var response = await httpClient.PostAsJsonAsync($"api/auth/login", userDTO);
+            var response = await httpClient.PostAsJsonAsync($"api/auth/login", user);
             if (!response.IsSuccessStatusCode)
             {
                 return string.Empty;
             }
 
-            var jsonString = await response.Content.ReadAsStringAsync();
-            var tokenDTO = JsonConvert.DeserializeObject<TokenDTO>(jsonString);
-            var token = tokenDTO.Token;
+            var token = await GetTokenValue(response);
             return token;
+        }
+
+        private async Task<string> GetTokenValue(HttpResponseMessage loginResponse)
+        {
+            var jsonString = await loginResponse.Content.ReadAsStringAsync();
+            var token = JsonConvert.DeserializeObject<Token>(jsonString);
+            return token.Value;
         }
     }
 }

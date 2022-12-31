@@ -81,7 +81,7 @@ namespace Falcon.Server.Hubs
             }
         }
 
-        public async Task JoinRoom(string room)
+        public async Task JoinRoomAsync(string room)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
@@ -91,7 +91,7 @@ namespace Falcon.Server.Hubs
             logger.Information("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
         }
 
-        public async Task QuitRoom()
+        public async Task QuitRoomAsync()
         {
             Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, userConnection.Room);

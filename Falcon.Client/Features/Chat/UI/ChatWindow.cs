@@ -16,11 +16,7 @@ namespace Falcon.Client.Features.Chat.UI
 
         public Action OnQuit { get; set; }
 
-        //Services
         private readonly SignalRClient signalRClient;
-
-        // SignalR
-        private static readonly object mutex = new();
 
         public ChatWindow(SignalRClient signalRClient) : base("Falcon")
         {

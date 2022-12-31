@@ -1,4 +1,5 @@
 using Falcon.Server;
+using Falcon.Server.Data;
 using Falcon.Server.Features.Auth.Models;
 using Falcon.Server.Features.Messages.Repositories;
 using Falcon.Server.Features.Messages.Services;
@@ -161,10 +162,7 @@ app.UseAuthorization();
 
 app.MapGet("/", () => Results.Redirect("/index.html"));
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-    endpoints.MapHub<ChatHub>("/chathub");
-});
+app.MapControllers();
+app.MapHub<ChatHub>("/chathub");
 
 app.Run();

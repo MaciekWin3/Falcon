@@ -4,7 +4,7 @@ using Falcon.Server.Features.Rooms.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Falcon.Server
+namespace Falcon.Server.Data
 {
     public class FalconDbContext : IdentityDbContext<ApplicationUser>
     {

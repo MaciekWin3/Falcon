@@ -35,7 +35,7 @@ namespace Falcon.Client
             Application.Init();
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
             Console.OutputEncoding = System.Text.Encoding.Default;
-            while (running != null)
+            while (running is not null)
             {
                 await running.Invoke();
             }
@@ -49,13 +49,11 @@ namespace Falcon.Client
             {
                 OnAuthorize = async (authData) =>
                 {
-                    return await authService.Login(authData.name, authData.password);
+                    return await authService.LoginAsync(authData);
                 },
 
                 OnLogin = async (token) =>
                 {
-                    // Todo: delete
-                    // await chatService.RunAsync(token);
                     await signalRClient.StartConnectionAsync(token);
                     Application.MainLoop.Invoke(() =>
                     {
@@ -67,7 +65,6 @@ namespace Falcon.Client
                 OnExit = () =>
                 {
                     running = null;
-                    //top.Running = false;
                     Application.RequestStop();
                 },
 
@@ -91,7 +88,6 @@ namespace Falcon.Client
             win.OnQuit = () =>
             {
                 running = null;
-                //top.Running = false;
                 Application.RequestStop();
             };
             top.Add(win);
@@ -102,7 +98,6 @@ namespace Falcon.Client
 
         private Task ShowRoomWindow()
         {
-            // Sprawdzić synchroniczną metode
             var top = Application.Top;
             Application.MainLoop.Invoke(async () =>
             {
@@ -117,7 +112,7 @@ namespace Falcon.Client
                             // TODO: Popup with creating new chat
                             throw new NotImplementedException();
                         }
-                        await signalRClient.connection.InvokeCoreAsync("JoinRoom", args: new[] { room });
+                        await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: new[] { room });
                         Application.MainLoop.Invoke(() =>
                         {
                             running = ShowChatWindow;

@@ -1,10 +1,11 @@
-﻿using Terminal.Gui;
+﻿using Falcon.Client.Features.Auth.Models;
+using Terminal.Gui;
 
 namespace Falcon.Client.Features.Auth.UI
 {
     public class LoginWindow : Window
     {
-        public Func<(string name, string password), Task<string>> OnAuthorize { get; set; }
+        public Func<User, Task<string>> OnAuthorize { get; set; }
         public Action<string> OnLogin { get; set; }
         public Action OnExit { get; set; }
         public Action OnQuit { get; set; }
@@ -88,7 +89,9 @@ namespace Falcon.Client.Features.Auth.UI
                     return;
                 }
 
-                var token = await OnAuthorize.Invoke((name: nameText.Text.ToString(), password: passwordText.Text.ToString()));
+                var user = new User(username: nameText.Text.ToString(), password: passwordText.Text.ToString());
+
+                var token = await OnAuthorize.Invoke(user);
                 if (string.IsNullOrEmpty(token))
                 {
                     MessageBox.ErrorQuery(24, 8, "Error", "Invalid credentials", "Ok");

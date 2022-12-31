@@ -1,4 +1,5 @@
-﻿using Falcon.Server.Features.Messages.Models;
+﻿using Falcon.Server.Data;
+using Falcon.Server.Features.Messages.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Falcon.Server.Features.Messages.Repositories

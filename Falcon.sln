@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Client", "Falcon.Cli
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Server.Tests", "Falcon.Server.Tests\Falcon.Server.Tests.csproj", "{A6DA14E8-E389-4497-91A9-CBE2996953EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Falcon.Client.Tests", "Falcon.Client.Tests\Falcon.Client.Tests.csproj", "{8C26662D-5C21-45DF-9DD4-E357F9E37687}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Client.Tests", "Falcon.Client.Tests\Falcon.Client.Tests.csproj", "{8C26662D-5C21-45DF-9DD4-E357F9E37687}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

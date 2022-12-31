@@ -1,10 +1,12 @@
-﻿namespace Falcon.Server.Data
+﻿using Falcon.Server.Data;
+
+namespace Falcon.Server
 {
-    public abstract class BaseRepository
+    public class BaseRepository
     {
         protected readonly FalconDbContext context;
 
-        protected BaseRepository(FalconDbContext context)
+        public BaseRepository(FalconDbContext context)
         {
             this.context = context;
         }

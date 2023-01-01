@@ -18,23 +18,25 @@ cd Falcon
 dotnet restore
 ```
 
-After downloading project you will need to setup postgresql database and update `appsettings.json` in both projects. You can setup your postgres locally with whole server app, but if you want to host it on Azure we recomend using [Supabase](https://supabase.com/).
+After downloading project you will need to setup postgresql database and update `appsettings.json` in both projects.
 
-descripbe setup
+### Setup database 💾
 
-After database is created you need to update appsettings.json files. In server project under ConnectionStrings:Supabase put your connection string that you acquired from Supabase. After that you need to setup Entity Framework with these command:
+> This part of tutorial will be using [Supabase](https://supabase.com/) as postgresql database provider
+
+After database is created you need to update appsettings.json files. In server project under ConnectionStrings:FalconDB put your connection string that you acquired from Supabase. After that you need to setup Entity Framework with these command:
 
 ```bash
-Commands
+dotnet ef database update
 ```
 
-Then run both project with and check if you can login. If you are being redirected to Lobby windows, then congratulations you successfuly seted up Falcon Application 🎉
+## Setup Server with Azure ☁
 
-### Setup Server with Azure ☁
+The easiest way to host your falcon server is to use Azure services. To do this you need to open Visual Studio and click on Falcon.Server project and choose option Publish. Then follow the configurator and select all services as shown in the attached screenshots. In the described case, I chose the option of manually publishing the application. Once setup is complete, publish the app. After a few minutes, you should be able to view the applications at the URL indicated in Visual Studio and try to log in with the application. If you manage to log in, you have successfully configured the Falcon Server app. If you have already set up the database and updated configs, run both projects (client and server) with and check if you can login. If you are being redirected to lobby window, then congratulations you successfuly seted up Falcon Application 🎉
 
-The easiest way to host your falcon server is to use Azure services. To do this you need to ...
+## Download client app 💬
 
-### Use client app 💬
+> App is still in development and only way that you can use app is to setup development enviroment locally
 
 To connect to server download falcon client app from nuget ussing this command from your terminal:
 

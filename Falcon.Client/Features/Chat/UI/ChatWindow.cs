@@ -9,8 +9,8 @@ namespace Falcon.Client.Features.Chat.UI
     public class ChatWindow : Window
     {
         private string _username = "User";
-        private static readonly List<string> users = new List<string>();
-        private static readonly List<string> messages = new List<string>();
+        private static readonly List<string> users = new();
+        private static readonly List<string> messages = new();
         private static ListView chatListView;
         private static ListView userList;
         private static TextField chatMessage;
@@ -51,6 +51,7 @@ namespace Falcon.Client.Features.Chat.UI
             chatListView.MoveEnd();
             chatListView.GetCurrentHeight(out int h);
             chatListView.ScrollUp(h - 1);
+            Application.Refresh();
         }
 
         public MenuBar CreateMenuBar()
@@ -155,7 +156,7 @@ namespace Falcon.Client.Features.Chat.UI
                 if (a.KeyEvent.ToString().ToLower().Contains("enter"))
                 {
                     string message = chatMessage.Text.ToString();
-                    if (message[0] == '/')
+                    if (!string.IsNullOrEmpty(message) && message[0] == '/')
                     {
                         ExecuteCommand(message);
                     }

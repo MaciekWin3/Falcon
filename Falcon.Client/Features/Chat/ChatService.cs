@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Spectre.Console;
 
 namespace Falcon.Client.Features.Chat
 {
@@ -45,49 +44,25 @@ namespace Falcon.Client.Features.Chat
             return await signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveRooms");
         }
 
-        public async Task CheckForCommandAsync(string message)
+        public async Task SendDirectMessageAsync(string message)
         {
-            if (!message.StartsWith('/'))
-            {
-                return;
-            }
             List<string> splitString = message.Split(' ').ToList();
             int index = message.IndexOf(' ', message.IndexOf(' ') + 1);
             if (splitString[0] == "/dm")
             {
                 await connection.InvokeCoreAsync("SendDirectMessage", args: new[] { message.Remove(0, index), splitString[1] });
             }
-            else
-            {
-                switch (message)
-                {
-                    // Check if this is working
-                    case "/quit":
-                        await connection.InvokeAsync("QuitRoom");
-                        //await ChooseRoom();
-                        break;
+        }
 
-                    case "/users":
-                        // Needs improvments and move to own function
-                        var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
-                        var table = new Table();
-                        table.AddColumn("Users");
-                        foreach (var user in users)
-                        {
-                            table.AddRow($"[green]{user}[/]");
-                        }
-                        AnsiConsole.Write(table);
-                        break;
+        public async Task QuitRoomAsync()
+        {
+            await connection.InvokeAsync("QuitRoom");
+        }
 
-                    case "/exit":
-                        AnsiConsole.MarkupLine("[green]Exiting application...[/]");
-                        break;
-
-                    default:
-                        AnsiConsole.MarkupLine("[red]Invalid command![/]");
-                        break;
-                }
-            }
+        public async Task<List<string>> GetUsersAsync()
+        {
+            var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
+            return users;
         }
     }
 }

@@ -13,6 +13,7 @@ namespace Falcon.Client.Features.Chat.UI
         private static readonly List<string> messages = new List<string>();
         private static ListView chatListView;
         private static ListView userList;
+        private static TextField chatMessage;
 
         public Action OnQuit { get; set; }
 
@@ -63,9 +64,25 @@ namespace Falcon.Client.Features.Chat.UI
             });
         }
 
-        public void ExecuteCommand()
+        public void ExecuteCommand(string command)
         {
-            throw new NotImplementedException();
+            switch (command)
+            {
+                case "/clear":
+                    messages.Clear();
+                    chatListView.SetSource(messages);
+                    chatMessage.Text = string.Empty;
+                    chatListView.MovePageUp();
+                    /*
+                    chatListView.MoveEnd();
+                    chatListView.GetCurrentHeight(out int h);
+                    chatListView.ScrollUp(h - 1);
+                    */
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void chatListViewRender(ListViewRowEventArgs obj)
@@ -120,7 +137,7 @@ namespace Falcon.Client.Features.Chat.UI
                 Height = Dim.Fill()
             };
 
-            var chatMessage = new TextField(string.Empty)
+            chatMessage = new TextField(string.Empty)
             {
                 X = 0,
                 Y = Pos.Center(),
@@ -138,13 +155,20 @@ namespace Falcon.Client.Features.Chat.UI
                 if (a.KeyEvent.ToString().ToLower().Contains("enter"))
                 {
                     string message = chatMessage.Text.ToString();
-                    messages.Add($"{_username}: {message}");
-                    signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
-                    chatListView.SetSource(messages);
-                    chatMessage.Text = string.Empty;
-                    chatListView.MoveEnd();
-                    chatListView.GetCurrentHeight(out int h);
-                    chatListView.ScrollUp(h - 1);
+                    if (message[0] == '/')
+                    {
+                        ExecuteCommand(message);
+                    }
+                    else
+                    {
+                        messages.Add($"{_username}: {message}");
+                        signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
+                        chatListView.SetSource(messages);
+                        chatMessage.Text = string.Empty;
+                        chatListView.MoveEnd();
+                        chatListView.GetCurrentHeight(out int h);
+                        chatListView.ScrollUp(h - 1);
+                    }
                 }
             };
             chatBar.Add(chatMessage);

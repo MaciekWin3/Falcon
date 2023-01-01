@@ -26,6 +26,10 @@ namespace Falcon.Client.Features.Auth.UI
                 new MenuBarItem("App", new MenuItem []
                 {
                     new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                }),
+                new MenuBarItem("Help", new MenuItem[]
+                {
+                    new MenuItem("About", "About", () => MessageBox.Query(50, 5, "Hi!", "Application created by Maciej Winnik", "Ok"), null, null, Key.Q | Key.CtrlMask)
                 })
             });
         }
@@ -75,6 +79,18 @@ namespace Falcon.Client.Features.Auth.UI
 
             Add(loginButton);
             Add(exitButton);
+
+            var progressBar = new ProgressBar()
+            {
+                Y = 12,
+                X = Pos.Center(),
+                Width = 20
+            };
+            bool Timer(MainLoop caller)
+            {
+                progressBar.Pulse();
+                return true;
+            }
             loginButton.Clicked += async () =>
             {
                 if (nameText.Text.ToString().TrimStart().Length == 0)
@@ -89,9 +105,14 @@ namespace Falcon.Client.Features.Auth.UI
                     return;
                 }
 
+                Add(progressBar);
+                var x = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(300), Timer);
                 var user = new User(username: nameText.Text.ToString(), password: passwordText.Text.ToString());
 
                 var token = await OnAuthorize.Invoke(user);
+
+                Application.MainLoop.RemoveTimeout(x);
+                Remove(progressBar);
                 if (string.IsNullOrEmpty(token))
                 {
                     MessageBox.ErrorQuery(24, 8, "Error", "Invalid credentials", "Ok");

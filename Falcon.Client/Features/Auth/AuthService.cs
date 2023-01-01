@@ -1,5 +1,4 @@
 ﻿using Falcon.Client.Features.Auth.Models;
-using Falcon.Client.Features.Auth.UI;
 using Newtonsoft.Json;
 using System.Net.Http.Json;
 
@@ -14,17 +13,12 @@ namespace Falcon.Client.Features.Auth
             this.httpClientFactory = httpClientFactory;
         }
 
-        public LoginWindow CreateLoginWindow()
-        {
-            return new LoginWindow();
-        }
-
         public async Task<string> LoginAsync(User user)
         {
             try
             {
                 var response = await AuthorizeAsync(user);
-                if (response.Length != 0)
+                if (!string.IsNullOrEmpty(response))
                 {
                     return response;
                 }

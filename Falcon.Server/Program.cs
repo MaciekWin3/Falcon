@@ -41,7 +41,7 @@ builder.Services.AddSingleton(logger);
 builder.Services.AddEntityFrameworkNpgsql()
     .AddDbContext<FalconDbContext>(options => options
     .UseLazyLoadingProxies()
-    .UseNpgsql(builder.Configuration.GetConnectionString("Supabase")));
+    .UseNpgsql(builder.Configuration.GetConnectionString("SupabaseTest")));
 
 // Auth - checkParameters
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

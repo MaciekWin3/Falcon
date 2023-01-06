@@ -86,6 +86,7 @@ namespace Falcon.Server.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
             // Check if this is working
+            await Clients.Group(room).Connected(Context.UserIdentifier);
             await Clients.Group(room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has joined {room}");
             logger.Information("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
@@ -98,6 +99,7 @@ namespace Falcon.Server.Hubs
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, null);
             await Clients.Group(userConnection.Room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has left {userConnection.Room}");
+            await Clients.Group(userConnection.Room).Disconected(Context.UserIdentifier);
             logger.Information("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
         }
 

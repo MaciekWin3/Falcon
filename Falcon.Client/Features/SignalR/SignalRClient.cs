@@ -16,10 +16,20 @@ namespace Falcon.Client.Features.SignalR
 
         public event Action<string, string> OnReceiveMessage;
 
+        public event Action<string> OnConnect;
+
+        public event Action<string> OnDisconnect;
+
         private void CreateHub(string token)
         {
             connection = new HubConnectionBuilder()
-                .WithUrl($"{configuration["ServerIp"]}chathub?access_token=" + token)
+                .WithUrl($"{configuration["ServerIp"]}chathub?access_token=" + token, options =>
+                {
+                    options.AccessTokenProvider = () =>
+                    {
+                        return Task.FromResult(token);
+                    };
+                })
                 .ConfigureLogging(configureLogging =>
                 {
                     configureLogging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Debug);
@@ -29,6 +39,8 @@ namespace Falcon.Client.Features.SignalR
                 .Build();
 
             connection.On<string, string>("ReceiveMessage", (userName, message) => OnReceiveMessage?.Invoke(userName, message));
+            connection.On<string>("Connected", (username) => OnConnect?.Invoke(username));
+            connection.On<string>("Disconnected", (username) => OnDisconnect?.Invoke(username));
         }
 
         public async Task StartConnectionAsync(string token)

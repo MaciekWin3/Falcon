@@ -8,7 +8,6 @@ namespace Falcon.Client.Features.Chat.UI
 {
     public class ChatWindow : Window
     {
-        private string _username = "User";
         private static readonly List<string> users = new();
         private static readonly List<string> messages = new();
         private static ListView chatListView;
@@ -28,19 +27,24 @@ namespace Falcon.Client.Features.Chat.UI
             Height = Dim.Fill();
             Setup("Chat");
             this.signalRClient.OnReceiveMessage += OnReceiveMessageListener;
+            this.signalRClient.OnConnect += OnConnectLister;
+            this.signalRClient.OnDisconnect += OnDisconnectLister;
+        }
+
+        private void OnConnectLister(string username)
+        {
+            users.Add(username);
+            Application.Refresh();
+        }
+
+        private void OnDisconnectLister(string username)
+        {
+            users.Remove(username);
+            Application.Refresh();
         }
 
         private void OnReceiveMessageListener(string userName, string message)
         {
-            //ThreadStart thread = () => ConnectionLister(userName, message);
-            //lock (mutex)
-            //{
-            //    if (main == null)
-            //    {
-            //        main = new Thread(thread);
-            //    }
-            //    main.Start();
-            //}
             ConnectionLister(userName, message);
         }
 
@@ -147,8 +151,6 @@ namespace Falcon.Client.Features.Chat.UI
             };
 
             // Test
-            users.Add(_username);
-            users.Add("Konrad");
             userList.SetSource(users);
 
             KeyDown += (a) =>
@@ -162,7 +164,7 @@ namespace Falcon.Client.Features.Chat.UI
                     }
                     else
                     {
-                        messages.Add($"{_username}: {message}");
+                        messages.Add($"You: {message}");
                         signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
                         chatListView.SetSource(messages);
                         chatMessage.Text = string.Empty;

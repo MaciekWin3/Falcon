@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Falcon.Client.Features.Chat
 {
-    public class ChatService
+    public class ChatService : IChatService
     {
         private readonly IConfiguration configuration;
         private readonly SignalRClient signalRClient;
@@ -57,6 +57,11 @@ namespace Falcon.Client.Features.Chat
         public async Task QuitRoomAsync()
         {
             await connection.InvokeAsync("QuitRoom");
+        }
+
+        public async Task<string> GetUsernameAsync()
+        {
+            return await connection.InvokeAsync<string>("GetUsername");
         }
 
         public async Task<List<string>> GetUsersAsync()

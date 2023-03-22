@@ -2,8 +2,8 @@
 {
     public interface IChatService
     {
-        Task RunAsync();
+        Task RunAsync(string token);
 
-        Task RunChat();
+        Task<string> GetUsernameAsync();
     }
 }

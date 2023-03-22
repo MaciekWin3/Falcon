@@ -130,6 +130,11 @@ namespace Falcon.Server.Hubs
             return true;
         }
 
+        public string GetUsername()
+        {
+            return Context.UserIdentifier;
+        }
+
         private string GetUserGroup()
         {
             Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection);

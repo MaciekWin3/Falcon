@@ -17,8 +17,9 @@ namespace Falcon.Client.Features.Chat.UI
         public Action OnQuit { get; set; }
 
         private readonly SignalRClient signalRClient;
+        public string Username { get; private set; }
 
-        public ChatWindow(SignalRClient signalRClient) : base("Falcon")
+        public ChatWindow(SignalRClient signalRClient, string username) : base("Falcon")
         {
             this.signalRClient = signalRClient;
             X = 0;
@@ -29,6 +30,7 @@ namespace Falcon.Client.Features.Chat.UI
             this.signalRClient.OnReceiveMessage += OnReceiveMessageListener;
             this.signalRClient.OnConnect += OnConnectLister;
             this.signalRClient.OnDisconnect += OnDisconnectLister;
+            Username = username;
         }
 
         private void OnConnectLister(string username)

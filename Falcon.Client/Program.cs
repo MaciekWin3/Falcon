@@ -37,7 +37,7 @@ namespace Falcon.Client
                     {
                         client.BaseAddress = new Uri(configuration["ServerIp"]);
                     });
-                    // Do we need this?
+
                     services.AddLogging(builder =>
                         {
                             builder

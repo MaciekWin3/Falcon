@@ -17,9 +17,8 @@ namespace Falcon.Client.Features.Chat.UI
         public Action OnQuit { get; set; }
 
         private readonly SignalRClient signalRClient;
-        public string Username { get; private set; }
 
-        public ChatWindow(SignalRClient signalRClient, string username) : base("Falcon")
+        public ChatWindow(SignalRClient signalRClient) : base("Falcon")
         {
             this.signalRClient = signalRClient;
             X = 0;
@@ -30,7 +29,7 @@ namespace Falcon.Client.Features.Chat.UI
             this.signalRClient.OnReceiveMessage += OnReceiveMessageListener;
             this.signalRClient.OnConnect += OnConnectLister;
             this.signalRClient.OnDisconnect += OnDisconnectLister;
-            Username = username;
+            chatListView.SetSource(messages);
         }
 
         private void OnConnectLister(string username)
@@ -53,7 +52,6 @@ namespace Falcon.Client.Features.Chat.UI
         private static void ConnectionLister(string userName, string message)
         {
             messages.Add($"{userName}: {message}");
-            chatListView.SetSource(messages);
             chatListView.MoveEnd();
             chatListView.GetCurrentHeight(out int h);
             chatListView.ScrollUp(h - 1);
@@ -77,7 +75,6 @@ namespace Falcon.Client.Features.Chat.UI
             {
                 case "/clear":
                     messages.Clear();
-                    chatListView.SetSource(messages);
                     chatMessage.Text = string.Empty;
                     chatListView.MovePageUp();
                     /*
@@ -92,10 +89,10 @@ namespace Falcon.Client.Features.Chat.UI
             }
         }
 
-        private void chatListViewRender(ListViewRowEventArgs obj)
-        {
-            //obj.RowAttribute = new Attribute(Color.BrightMagenta, Color.Green);
-        }
+        //private void ChatListViewRender(ListViewRowEventArgs obj)
+        //{
+        //    //obj.RowAttribute = new Attribute(Color.BrightMagenta, Color.Green);
+        //}
 
         public void Setup(string text)
         {
@@ -115,7 +112,7 @@ namespace Falcon.Client.Features.Chat.UI
                 Height = Dim.Fill(),
                 CanFocus = false
             };
-            chatListView.RowRender += chatListViewRender;
+            //chatListView.RowRender += ChatListViewRender;
 
             chatViewFrame.Add(chatListView);
             Add(chatViewFrame);
@@ -155,9 +152,9 @@ namespace Falcon.Client.Features.Chat.UI
             // Test
             userList.SetSource(users);
 
-            KeyDown += (a) =>
+            chatMessage.KeyPress += (a) =>
             {
-                if (a.KeyEvent.ToString().ToLower().Contains("enter"))
+                if (a.KeyEvent.Key == Key.Enter)
                 {
                     string message = chatMessage.Text.ToString();
                     if (!string.IsNullOrEmpty(message) && message[0] == '/')
@@ -166,13 +163,13 @@ namespace Falcon.Client.Features.Chat.UI
                     }
                     else
                     {
-                        messages.Add($"You: {message}");
+                        messages.Add($"You: {message ?? "Co tu sie odkuriwa"}");
                         signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
-                        chatListView.SetSource(messages);
                         chatMessage.Text = string.Empty;
                         chatListView.MoveEnd();
                         chatListView.GetCurrentHeight(out int h);
                         chatListView.ScrollUp(h - 1);
+                        a.Handled = true;
                     }
                 }
             };

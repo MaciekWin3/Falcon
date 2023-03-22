@@ -47,10 +47,7 @@ namespace Falcon.Client
             var top = Application.Top;
             var win = new LoginWindow
             {
-                OnAuthorize = async (authData) =>
-                {
-                    return await authService.LoginAsync(authData);
-                },
+                OnAuthorize = authService.LoginAsync,
 
                 OnLogin = async (token) =>
                 {

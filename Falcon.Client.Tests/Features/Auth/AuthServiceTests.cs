@@ -9,7 +9,6 @@ namespace Falcon.Client.Tests.Features.Auth
     {
         private Mock<IHttpClientFactory> httpClientFactoryMock;
         private Mock<HttpClient> httpClientMock;
-        private readonly string username = "username";
         private readonly string password = "password";
 
         [SetUp]

@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Terminal.Gui;
 
-//using Attribute = Terminal.Gui.Attribute;
-
 namespace Falcon.Client.Features.Chat.UI
 {
     public class ChatWindow : Window
@@ -77,22 +75,12 @@ namespace Falcon.Client.Features.Chat.UI
                     messages.Clear();
                     chatMessage.Text = string.Empty;
                     chatListView.MovePageUp();
-                    /*
-                    chatListView.MoveEnd();
-                    chatListView.GetCurrentHeight(out int h);
-                    chatListView.ScrollUp(h - 1);
-                    */
                     break;
 
                 default:
                     break;
             }
         }
-
-        //private void ChatListViewRender(ListViewRowEventArgs obj)
-        //{
-        //    //obj.RowAttribute = new Attribute(Color.BrightMagenta, Color.Green);
-        //}
 
         public void Setup(string text)
         {
@@ -110,9 +98,9 @@ namespace Falcon.Client.Features.Chat.UI
                 Y = 0,
                 Width = Dim.Fill(),
                 Height = Dim.Fill(),
-                CanFocus = false
+                CanFocus = false,
+                AllowsMarking = false,
             };
-            //chatListView.RowRender += ChatListViewRender;
 
             chatViewFrame.Add(chatListView);
             Add(chatViewFrame);
@@ -163,7 +151,7 @@ namespace Falcon.Client.Features.Chat.UI
                     }
                     else
                     {
-                        messages.Add($"You: {message ?? "Co tu sie odkuriwa"}");
+                        messages.Add($"You: {message ?? ""}");
                         signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
                         chatMessage.Text = string.Empty;
                         chatListView.MoveEnd();

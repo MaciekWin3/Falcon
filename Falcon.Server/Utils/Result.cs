@@ -8,11 +8,9 @@ namespace Falcon.Server.Utils
         public Error Error { get; }
         public bool IsFailure => !IsSuccess;
 
-        public object Should { get; set; }
-
         protected Result(bool isSuccess, Error error)
         {
-            if (error == null)
+            if (error is null)
             {
                 throw new InvalidOperationException();
             }

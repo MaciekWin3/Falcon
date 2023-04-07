@@ -9,8 +9,9 @@ using ILogger = Serilog.ILogger;
 
 namespace Falcon.Server.Features.Auth.Controllers
 {
-    [Route("api/auth")]
     [ApiController]
+    [ApiExplorerSettings(GroupName = "Auth")]
+    [Route("api/auth")]
     public class AuthController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;

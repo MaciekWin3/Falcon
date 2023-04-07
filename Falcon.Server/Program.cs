@@ -10,8 +10,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
+using System.Reflection;
 using System.Security.Claims;
 using System.Text;
 using ILogger = Serilog.ILogger;
@@ -87,58 +89,65 @@ builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddSingleton<IDictionary<string, UserConnection>>(x => new Dictionary<string, UserConnection>());
 builder.Services.AddSingleton(x => new HashSet<string>() { "All", "Create new room" });
 
-// Swagger
-//builder.Services.AddSwaggerGen(options =>
-//{
-//    var apiInfo = new OpenApiInfo { Title = "TestWebApi", Version = "v1" };
-//    options.SwaggerDoc("controllers", apiInfo);
-//    options.SwaggerDoc("hubs", apiInfo);
-//    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Falcon", Version = "v1" });
+//Swagger
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Falcon API v1", Version = "v1" });
 
-//    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-//    {
-//        Description = @"JWT",
-//        Name = "Authorization",
-//        In = ParameterLocation.Header,
-//        Scheme = "Bearer",
-//        Type = SecuritySchemeType.Http,
-//    });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Scheme = "Bearer",
+        Type = SecuritySchemeType.Http,
+    });
 
-//    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
-//    {
-//        {
-//            new OpenApiSecurityScheme
-//            {
-//                Reference = new OpenApiReference
-//                {
-//                    Type = ReferenceType.SecurityScheme,
-//                    Id = "Bearer"
-//                },
-//                Name = "Bearer",
-//                In = ParameterLocation.Header
-//            },
-//            new List<string>()
-//        }
-//    });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
 
-//    options.AddSignalRSwaggerGen();
-//});
+    c.AddSignalRSwaggerGen();
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
+    c.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
+
+    c.TagActionsBy(api => new[] { api.GroupName });
+    c.EnableAnnotations();
+});
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    //app.UseSwagger();
-    //app.UseSwaggerUI(options =>
-    //{
-    //    options.SwaggerEndpoint("/swagger/controllers/swagger.json", "REST API");
-    //    options.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
-    //});
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Falcon API v1");
+        //c.SwaggerEndpoint("/swagger/controllers/swagger.json", "REST API");
+        //c.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
+        c.RoutePrefix = "";
+    });
 }
 else
 {
-    //app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
 }
 
 app.UseFileServer(new FileServerOptions

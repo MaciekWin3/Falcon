@@ -4,10 +4,12 @@ using Falcon.Server.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using SignalRSwaggerGen.Attributes;
 using ILogger = Serilog.ILogger;
 
 namespace Falcon.Server.Hubs
 {
+    [SignalRHub]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatHub : Hub<IChatHubClient>
     {

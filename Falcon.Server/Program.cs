@@ -12,11 +12,11 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Serilog.Events;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
-using ILogger = Serilog.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,12 +32,19 @@ builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
 
 // Logger
-builder.Logging.ClearProviders();
-ILogger logger = new LoggerConfiguration()
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .WriteTo.Debug()
     .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+    .WriteTo.PostgreSQL(
+        connectionString: builder.Configuration.GetConnectionString("FalconDB"),
+        tableName: "Logs",
+        needAutoCreateTable: true
+    )
+    .Enrich.FromLogContext()
     .CreateLogger();
-builder.Logging.AddSerilog(logger);
-builder.Services.AddSingleton(logger);
+
+builder.Host.UseSerilog();
 
 // Database
 builder.Services.AddEntityFrameworkNpgsql()

@@ -7,7 +7,7 @@ using ILogger = Serilog.ILogger;
 namespace Falcon.Server.Tests.Features.Hubs
 {
     [TestFixture]
-    internal class ChatHubTests
+    public class ChatHubTests
     {
         private const string FALCON_BOT = "Falcon Bot";
         private Mock<IMessageService> messageServiceMock;

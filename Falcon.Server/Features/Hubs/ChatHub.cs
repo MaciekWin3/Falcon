@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
-using ILogger = Serilog.ILogger;
 
 namespace Falcon.Server.Hubs
 {
@@ -16,12 +15,12 @@ namespace Falcon.Server.Hubs
         private readonly string falconBot;
         private readonly IMessageService messageService;
         private readonly IConfiguration configuration;
-        private readonly ILogger logger;
+        private readonly ILogger<ChatHub> logger;
         private IDictionary<string, UserConnection> Connections { get; set; }
         private HashSet<string> Rooms { get; set; }
 
         public ChatHub(IMessageService messageService, IConfiguration configuration,
-            ILogger logger, IDictionary<string, UserConnection> connections, HashSet<string> rooms)
+            ILogger<ChatHub> logger, IDictionary<string, UserConnection> connections, HashSet<string> rooms)
         {
             falconBot = "Falcon Bot";
             this.messageService = messageService;
@@ -35,7 +34,7 @@ namespace Falcon.Server.Hubs
         {
             var user = Context.UserIdentifier;
             Connections.Add(Context.ConnectionId, new UserConnection(user, "All"));
-            logger.Information("Connection established: {0}, user: {1}", Context.ConnectionId, user);
+            logger.LogInformation("Connection established: {0}, user: {1}", Context.ConnectionId, user);
             return base.OnConnectedAsync();
         }
 
@@ -46,7 +45,7 @@ namespace Falcon.Server.Hubs
                 Connections.Remove(Context.ConnectionId);
                 Clients.Group(userConnection.Room).ReceiveMessage(falconBot, $"{userConnection.Username} has left");
             }
-            logger.Information("Connection closed: {0}, user: {1}", Context.ConnectionId, Context.UserIdentifier);
+            logger.LogInformation("Connection closed: {0}, user: {1}", Context.ConnectionId, Context.UserIdentifier);
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -91,7 +90,7 @@ namespace Falcon.Server.Hubs
             await Clients.Group(room).Connected(Context.UserIdentifier);
             await Clients.Group(room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has joined {room}");
-            logger.Information("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
+            logger.LogInformation("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
         }
 
         public async Task QuitRoomAsync()
@@ -102,7 +101,7 @@ namespace Falcon.Server.Hubs
             await Clients.Group(userConnection.Room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has left {userConnection.Room}");
             await Clients.Group(userConnection.Room).Disconected(Context.UserIdentifier);
-            logger.Information("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
+            logger.LogInformation("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
         }
 
         public List<string> ShowActiveRooms()
@@ -128,7 +127,7 @@ namespace Falcon.Server.Hubs
                 return false;
             }
             Rooms.Add(room);
-            logger.Information("Room {0} created", room);
+            logger.LogInformation("Room {0} created", room);
             return true;
         }
 

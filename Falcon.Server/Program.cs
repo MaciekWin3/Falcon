@@ -20,6 +20,21 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Logger
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+    .WriteTo.Debug()
+    .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
+    .WriteTo.PostgreSQL(
+        connectionString: builder.Configuration.GetConnectionString("Supabase"),
+        tableName: "Logs",
+        needAutoCreateTable: true
+    )
+    .Enrich.FromLogContext()
+    .CreateLogger();
+
+builder.Host.UseSerilog();
+
 builder.Services.AddAuthentication(
         CertificateAuthenticationDefaults.AuthenticationScheme)
     .AddCertificate();
@@ -31,26 +46,11 @@ builder.Services.AddControllers();
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddHttpClient();
 
-// Logger
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
-    .WriteTo.Debug()
-    .WriteTo.Console(theme: AnsiConsoleTheme.Literate)
-    .WriteTo.PostgreSQL(
-        connectionString: builder.Configuration.GetConnectionString("FalconDB"),
-        tableName: "Logs",
-        needAutoCreateTable: true
-    )
-    .Enrich.FromLogContext()
-    .CreateLogger();
-
-builder.Host.UseSerilog();
-
 // Database
-builder.Services.AddEntityFrameworkNpgsql()
+builder.Services
     .AddDbContext<FalconDbContext>(options => options
     .UseLazyLoadingProxies()
-    .UseNpgsql(builder.Configuration.GetConnectionString("FalconDB")));
+    .UseNpgsql(builder.Configuration.GetConnectionString("Supabase")));
 
 // Auth - checkParameters
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -140,6 +140,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+app.UseSerilogRequestLogging();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -147,8 +149,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Falcon API v1");
-        //c.SwaggerEndpoint("/swagger/controllers/swagger.json", "REST API");
-        //c.SwaggerEndpoint("/swagger/hubs/swagger.json", "SignalR");
         c.RoutePrefix = "";
     });
 }

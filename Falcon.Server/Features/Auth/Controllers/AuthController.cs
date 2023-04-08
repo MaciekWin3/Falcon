@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
-using ILogger = Serilog.ILogger;
 
 namespace Falcon.Server.Features.Auth.Controllers
 {
@@ -16,13 +15,13 @@ namespace Falcon.Server.Features.Auth.Controllers
     {
         private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ILogger<AuthController> logger;
         private readonly IMapper mapper;
-        private readonly ILogger logger;
         private readonly IConfiguration configuration;
 
         public AuthController(UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-            IMapper mapper, ILogger logger, IConfiguration configuration)
+            ILogger<AuthController> logger, IMapper mapper, IConfiguration configuration)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -40,7 +39,7 @@ namespace Falcon.Server.Features.Auth.Controllers
             var result = await userManager.CreateAsync(user, userDTO.Password);
             if (result.Succeeded)
             {
-                logger.Information("New user created: {0}", user.UserName);
+                logger.LogInformation("New user created: {0}", user.UserName);
                 return new UserToken(user.UserName, configuration["Jwt:Key"]);
             }
             else
@@ -59,7 +58,7 @@ namespace Falcon.Server.Features.Auth.Controllers
                 userDTO.Password, isPersistent: false, lockoutOnFailure: false);
             if (result.Succeeded)
             {
-                logger.Information("User logged in: {0}", userDTO.Username);
+                logger.LogInformation("User logged in: {0}", userDTO.Username);
                 return new UserToken(userDTO.Username, configuration["Jwt:Key"]);
             }
             else

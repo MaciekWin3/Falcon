@@ -6,8 +6,8 @@ namespace Falcon.Client.Features.Chat.UI
 {
     public class ChatWindow : Window
     {
-        private static readonly List<string> users = new();
         private static readonly List<string> messages = new();
+        private static List<string> users = new();
         private static ListView chatListView;
         private static ListView userList;
         private static TextField chatMessage;
@@ -15,10 +15,12 @@ namespace Falcon.Client.Features.Chat.UI
         public Action OnQuit { get; set; }
 
         private readonly SignalRClient signalRClient;
+        private readonly ChatService chatService;
 
-        public ChatWindow(SignalRClient signalRClient) : base("Falcon")
+        public ChatWindow(SignalRClient signalRClient, ChatService chatService) : base("Falcon")
         {
             this.signalRClient = signalRClient;
+            this.chatService = chatService;
             X = 0;
             Y = 1;
             Width = Dim.Fill();
@@ -30,9 +32,9 @@ namespace Falcon.Client.Features.Chat.UI
             chatListView.SetSource(messages);
         }
 
-        private void OnConnectLister(string username)
+        private async void OnConnectLister()
         {
-            users.Add(username);
+            users = await chatService.GetUsersAsync();
             Application.Refresh();
         }
 
@@ -76,7 +78,6 @@ namespace Falcon.Client.Features.Chat.UI
                     chatMessage.Text = string.Empty;
                     chatListView.MovePageUp();
                     break;
-
                 default:
                     break;
             }

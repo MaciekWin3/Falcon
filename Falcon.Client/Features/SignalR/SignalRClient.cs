@@ -16,7 +16,7 @@ namespace Falcon.Client.Features.SignalR
 
         public event Action<string, string> OnReceiveMessage;
 
-        public event Action<string> OnConnect;
+        public event Action OnConnect;
 
         public event Action<string> OnDisconnect;
 
@@ -39,7 +39,7 @@ namespace Falcon.Client.Features.SignalR
                 .Build();
 
             connection.On<string, string>("ReceiveMessage", (userName, message) => OnReceiveMessage?.Invoke(userName, message));
-            connection.On<string>("Connected", (username) => OnConnect?.Invoke(username));
+            connection.On("Connected", () => OnConnect?.Invoke());
             connection.On<string>("Disconnected", (username) => OnDisconnect?.Invoke(username));
         }
 

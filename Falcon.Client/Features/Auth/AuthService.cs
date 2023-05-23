@@ -41,7 +41,6 @@ namespace Falcon.Client.Features.Auth
             {
                 return string.Empty;
             }
-
             var token = await GetTokenValue(response);
             return token;
         }

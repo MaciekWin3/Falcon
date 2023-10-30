@@ -2,7 +2,7 @@
 using Falcon.Server.Features.Messages.Repositories;
 using Falcon.Server.Features.Messages.Services;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using NUnit.Framework;
 using System.Threading.Tasks;
 
@@ -11,12 +11,12 @@ namespace Falcon.Server.Tests.Features.Messages
     [TestFixture]
     internal class MessagesServiceTests
     {
-        private Mock<IMessageRepository> messageRepositoryMock;
+        private IMessageRepository messageRepositoryMock = null!;
 
         [SetUp]
         public void Setup()
         {
-            messageRepositoryMock = new Mock<IMessageRepository>();
+            messageRepositoryMock = Substitute.For<IMessageRepository>();
         }
 
         [Test]
@@ -27,7 +27,9 @@ namespace Falcon.Server.Tests.Features.Messages
             var messageService = CreateMessageService();
 
             // Act
-            messageRepositoryMock.Setup(x => x.CreateAsync(message)).Returns(Task.FromResult(message));
+            messageRepositoryMock
+                .CreateAsync(message)
+                .Returns(Task.FromResult(message));
 
             // Assert
             var result = await messageService.CreateAsync(message);
@@ -36,7 +38,7 @@ namespace Falcon.Server.Tests.Features.Messages
 
         private MessageService CreateMessageService()
         {
-            return new MessageService(messageRepositoryMock.Object);
+            return new MessageService(messageRepositoryMock);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Falcon.Client.Features.Auth.Models;
-using Newtonsoft.Json;
 using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace Falcon.Client.Features.Auth
 {
@@ -48,7 +48,7 @@ namespace Falcon.Client.Features.Auth
         private async Task<string> GetTokenValue(HttpResponseMessage loginResponse)
         {
             var jsonString = await loginResponse.Content.ReadAsStringAsync();
-            var token = JsonConvert.DeserializeObject<Token>(jsonString);
+            var token = JsonSerializer.Deserialize<Token>(jsonString);
             return token.Value;
         }
     }

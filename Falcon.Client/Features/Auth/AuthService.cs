@@ -48,7 +48,11 @@ namespace Falcon.Client.Features.Auth
         private async Task<string> GetTokenValue(HttpResponseMessage loginResponse)
         {
             var jsonString = await loginResponse.Content.ReadAsStringAsync();
-            var token = JsonSerializer.Deserialize<Token>(jsonString);
+            var token = JsonSerializer.Deserialize<Token>(jsonString, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
             return token.Value;
         }
     }

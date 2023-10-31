@@ -15,8 +15,8 @@ namespace Falcon.Server.Tests.Utils
             // Arrage
             string text = "Hello, world!";
             // Act
-            string encryptedText = Cryptography.EncryptDecrypt(text, CRYPTOGRAPHY_KEY);
-            string decryptedText = Cryptography.EncryptDecrypt(encryptedText, CRYPTOGRAPHY_KEY);
+            string encryptedText = Cryptography.XorEncrypt(text, CRYPTOGRAPHY_KEY);
+            string decryptedText = Cryptography.XorDecrypt(encryptedText, CRYPTOGRAPHY_KEY);
 
             // Assert
             encryptedText.Should().NotBe(decryptedText);

@@ -33,7 +33,7 @@ namespace Falcon.Server.Features.Auth.Controllers
         [HttpPost("register")]
         [SwaggerResponse((int)HttpStatusCode.Created, "Creates new user", typeof(UserDTO))]
         [SwaggerOperation(Summary = "Register new user")]
-        public async Task<ActionResult<UserToken>> Register(UserDTO userDTO)
+        public async Task<ActionResult<UserToken>> RegisterAsync(UserDTO userDTO)
         {
             var user = mapper.Map<UserDTO, ApplicationUser>(userDTO);
             var result = await userManager.CreateAsync(user, userDTO.Password);
@@ -52,10 +52,11 @@ namespace Falcon.Server.Features.Auth.Controllers
         [HttpPost("login")]
         [SwaggerResponse((int)HttpStatusCode.OK, "User login", typeof(UserDTO))]
         [SwaggerOperation(Summary = "User login")]
-        public async Task<ActionResult<UserToken>> Login(UserDTO userDTO)
+        public async Task<ActionResult<UserToken>> LoginAsync(UserDTO userDTO)
         {
             var result = await signInManager.PasswordSignInAsync(userDTO.Username,
                 userDTO.Password, isPersistent: false, lockoutOnFailure: false);
+
             if (result.Succeeded)
             {
                 logger.LogInformation("User logged in: {0}", userDTO.Username);

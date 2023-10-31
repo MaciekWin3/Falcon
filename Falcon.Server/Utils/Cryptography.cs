@@ -1,22 +1,23 @@
-﻿using System.Text;
-
-namespace Falcon.Server.Utils
+﻿namespace Falcon.Server.Utils
 {
     public static class Cryptography
     {
-        // XOR encryption
-        public static string EncryptDecrypt(string text, int encryptionKey)
+        public static string XorEncrypt(string text, int encryptionKey)
         {
-            StringBuilder inputString = new(text);
-            StringBuilder outputString = new(text.Length);
-            char character;
+            char[] encryptedChars = new char[text.Length];
             for (int i = 0; i < text.Length; i++)
             {
-                character = inputString[i];
-                character = (char)(character ^ encryptionKey);
-                outputString.Append(character);
+                char character = text[i];
+                int encryptedCharCode = character + encryptionKey;
+                char encryptedChar = (char)encryptedCharCode;
+                encryptedChars[i] = encryptedChar;
             }
-            return outputString.ToString();
+            return string.Concat(encryptedChars);
+        }
+
+        public static string XorDecrypt(string text, int encryptionKey)
+        {
+            return XorEncrypt(text, -encryptionKey);
         }
     }
 }

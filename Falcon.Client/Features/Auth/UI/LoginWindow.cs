@@ -101,7 +101,7 @@ namespace Falcon.Client.Features.Auth.UI
 
                 if (string.IsNullOrEmpty(passwordText.Text.ToString()))
                 {
-                    MessageBox.ErrorQuery(24, 8, "Error", "Invalid credentials", "Ok");
+                    MessageBox.ErrorQuery(24, 8, "Error", "Invalid username or password", "Ok");
                     return;
                 }
 

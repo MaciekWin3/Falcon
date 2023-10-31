@@ -17,6 +17,7 @@ using Serilog.Sinks.SystemConsole.Themes;
 using System.Reflection;
 using System.Security.Claims;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,12 +29,20 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.PostgreSQL(
         connectionString: builder.Configuration.GetConnectionString("Supabase"),
         tableName: "Logs",
-        needAutoCreateTable: true
+        needAutoCreateTable: true,
+        restrictedToMinimumLevel: LogEventLevel.Information
     )
     .Enrich.FromLogContext()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
+
 
 builder.Services.AddAuthentication(
         CertificateAuthenticationDefaults.AuthenticationScheme)
@@ -127,10 +136,16 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    c.AddSignalRSwaggerGen();
-
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    c.AddSignalRSwaggerGen(s =>
+    {
+        s.UseHubXmlCommentsSummaryAsTagDescription = true;
+        s.UseHubXmlCommentsSummaryAsTag = true;
+        s.UseXmlComments(xmlPath);
+    });
+
     c.IncludeXmlComments(xmlPath);
     c.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
 

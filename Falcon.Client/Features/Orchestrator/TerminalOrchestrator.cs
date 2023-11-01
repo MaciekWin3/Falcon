@@ -54,16 +54,6 @@ namespace Falcon.Client
                         await ShowRoomWindow();
                     });
                 },
-
-                OnExit = () =>
-                {
-                    Application.RequestStop();
-                },
-
-                OnQuit = () =>
-                {
-                    Application.RequestStop();
-                },
             };
             top.Add(loginWindow);
             top.Add(loginWindow.CreateMenuBar());
@@ -88,11 +78,6 @@ namespace Falcon.Client
                     await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: new[] { room });
                     ShowChatWindowNew();
                 },
-
-                OnQuit = () =>
-                {
-                    Application.RequestStop();
-                }
             };
             top.Add(win);
             top.Add(win.CreateMenuBar());

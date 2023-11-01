@@ -91,6 +91,7 @@ namespace Falcon.Client.Features.Auth.UI
                 progressBar.Pulse();
                 return true;
             }
+
             loginButton.Clicked += async () =>
             {
                 if (nameText.Text.ToString().TrimStart().Length == 0)

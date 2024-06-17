@@ -11,9 +11,6 @@ namespace Falcon.Client.Features.Chat.UI
         private static ListView chatListView;
         private static ListView userList;
         private static TextField chatMessage;
-
-        public Action OnQuit { get; set; }
-
         private readonly SignalRClient signalRClient;
         private readonly ChatService chatService;
 
@@ -64,7 +61,7 @@ namespace Falcon.Client.Features.Chat.UI
             {
                 new MenuBarItem("App", new MenuItem []
                 {
-                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.CtrlMask | Key.Q)
+                    new MenuItem("Quit", "Quit App", () => Application.RequestStop(), null, null, Key.CtrlMask | Key.Q)
                 })
             });
         }

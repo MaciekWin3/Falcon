@@ -31,7 +31,8 @@ namespace Falcon.Client
         public void InitApp()
         {
             Application.Init();
-            Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
+            //Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
+            Colors.Base = Colors.TopLevel;
             Console.OutputEncoding = System.Text.Encoding.Default;
             ShowLoginWindow();
             Application.Run();
@@ -89,10 +90,6 @@ namespace Falcon.Client
             Application.Top.RemoveAll();
             var top = Application.Top;
             var win = serviceProvider.GetService<ChatWindow>();
-            win.OnQuit = () =>
-            {
-                Application.RequestStop();
-            };
             top.Add(win);
             top.Add(win.CreateMenuBar());
             Application.Refresh();

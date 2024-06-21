@@ -10,9 +10,8 @@ using Terminal.Gui;
 
 namespace Falcon.Client
 {
-    internal class TerminalOrchestrator
+    public sealed class TerminalOrchestrator
     {
-        private Func<Task> running;
         private readonly ChatService chatService;
         private readonly AuthService authService;
         private readonly SignalRClient signalRClient;
@@ -22,7 +21,6 @@ namespace Falcon.Client
         public TerminalOrchestrator(ChatService chatService, AuthService authService,
             SignalRClient signalRClient, IServiceProvider serviceProvider)
         {
-            running = ShowLoginWindow;
             parameters = new Dictionary<string, string>();
             this.chatService = chatService;
             this.authService = authService;
@@ -30,104 +28,71 @@ namespace Falcon.Client
             this.serviceProvider = serviceProvider;
         }
 
-        public async Task Run()
+        public void InitApp()
         {
             Application.Init();
-            Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
+            //Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
+            Colors.Base = Colors.TopLevel;
             Console.OutputEncoding = System.Text.Encoding.Default;
-            while (running is not null)
-            {
-                await running.Invoke();
-            }
+            ShowLoginWindow();
+            Application.Run();
             Application.Shutdown();
         }
 
-        private Task ShowLoginWindow()
+        private void ShowLoginWindow()
         {
+            Application.Top.RemoveAll();
             var top = Application.Top;
-            var win = new LoginWindow
+            var loginWindow = new LoginWindow
             {
                 OnAuthorize = authService.LoginAsync,
 
                 OnLogin = async (token) =>
                 {
                     await signalRClient.StartConnectionAsync(token);
-                    Application.MainLoop.Invoke(() =>
+                    Application.MainLoop.Invoke(async () =>
                     {
-                        running = ShowRoomWindow;
-                        Application.RequestStop();
+                        await ShowRoomWindow();
                     });
                 },
-
-                OnExit = () =>
-                {
-                    running = null;
-                    Application.RequestStop();
-                },
-
-                OnQuit = () =>
-                {
-                    running = null;
-                    Application.RequestStop();
-                },
             };
-
-            top.Add(win);
-            top.Add(win.CreateMenuBar());
-            Application.Run();
-            return Task.CompletedTask;
+            top.Add(loginWindow);
+            top.Add(loginWindow.CreateMenuBar());
+            Application.Refresh();
         }
 
-        private Task ShowChatWindow()
+        private async Task ShowRoomWindow()
         {
+            Application.Top.RemoveAll();
+            var top = Application.Top;
+            IList<string> rooms = new List<string>();
+            rooms = await chatService.GetListOfRoomAsync();
+            var win = new LobbyWindow(rooms)
+            {
+                OnChatOpen = async (room) =>
+                {
+                    if (room == "Create new room")
+                    {
+                        // TODO: Popup with creating new chat
+                        throw new NotImplementedException();
+                    }
+                    await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: new[] { room });
+                    ShowChatWindowNew();
+                },
+            };
+            top.Add(win);
+            top.Add(win.CreateMenuBar());
+            Application.Refresh();
+        }
+
+        private void ShowChatWindowNew()
+        {
+            Application.Top.RemoveAll();
             var top = Application.Top;
             var win = serviceProvider.GetService<ChatWindow>();
-            win.OnQuit = () =>
-            {
-                running = null;
-                Application.RequestStop();
-            };
             top.Add(win);
             top.Add(win.CreateMenuBar());
-            Application.Run();
-            return Task.CompletedTask;
-        }
-
-        private Task ShowRoomWindow()
-        {
-            var top = Application.Top;
-            Application.MainLoop.Invoke(async () =>
-            {
-                IList<string> rooms = new List<string>();
-                rooms = await chatService.GetListOfRoomAsync();
-                var win = new LobbyWindow(rooms)
-                {
-                    OnChatOpen = async (room) =>
-                    {
-                        if (room == "Create new room")
-                        {
-                            // TODO: Popup with creating new chat
-                            throw new NotImplementedException();
-                        }
-                        await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: new[] { room });
-                        Application.MainLoop.Invoke(() =>
-                        {
-                            running = ShowChatWindow;
-                            Application.RequestStop();
-                        });
-                    },
-
-                    OnQuit = () =>
-                    {
-                        running = null;
-                        Application.RequestStop();
-                    }
-                };
-                top.Add(win);
-                top.Add(win.CreateMenuBar());
-            });
-            Application.Run();
-            return Task.CompletedTask;
+            Application.Refresh();
         }
     }
 }

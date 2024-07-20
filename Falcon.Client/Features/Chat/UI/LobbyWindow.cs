@@ -7,7 +7,6 @@ namespace Falcon.Client.Features.Lobby.UI
         public ListView RoomListView;
         private readonly IList<string> rooms;
         public Action<string> OnChatOpen { get; set; }
-        public Action OnQuit { get; set; }
 
         public LobbyWindow(IList<string> rooms) : base("Choose Room")
         {
@@ -41,7 +40,7 @@ namespace Falcon.Client.Features.Lobby.UI
             {
                 new MenuBarItem("App", new MenuItem []
                 {
-                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                    new MenuItem("Quit", "Quit App", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
                 })
             });
         }

@@ -1,4 +1,4 @@
-﻿using Falcon.Server.Hubs;
+﻿using Falcon.Server.Features.Hubs;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Falcon.Server.Features.Rooms

@@ -1,12 +1,13 @@
 ﻿using Falcon.Server.Features.Messages.Models;
 using Falcon.Server.Features.Messages.Services;
+using Falcon.Server.Hubs;
 using Falcon.Server.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 
-namespace Falcon.Server.Hubs
+namespace Falcon.Server.Features.Hubs
 {
     [SignalRHub]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]

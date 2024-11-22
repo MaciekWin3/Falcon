@@ -1,9 +1,9 @@
 using Falcon.Server;
 using Falcon.Server.Data;
 using Falcon.Server.Features.Auth.Models;
+using Falcon.Server.Features.Hubs;
 using Falcon.Server.Features.Messages.Repositories;
 using Falcon.Server.Features.Messages.Services;
-using Falcon.Server.Hubs;
 using Microsoft.AspNetCore.Authentication.Certificate;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;

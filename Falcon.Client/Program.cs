@@ -51,7 +51,7 @@ namespace Falcon.Client
                 .Build();
 
             var svc = ActivatorUtilities.CreateInstance<TerminalOrchestrator>(host.Services);
-            await svc.Run();
+            svc.InitApp();
         }
 
         private static void BuildConfig(IConfigurationBuilder builder)

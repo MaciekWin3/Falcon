@@ -7,8 +7,6 @@ namespace Falcon.Client.Features.Auth.UI
     {
         public Func<User, Task<string>> OnAuthorize { get; set; }
         public Action<string> OnLogin { get; set; }
-        public Action OnExit { get; set; }
-        public Action OnQuit { get; set; }
 
         public LoginWindow() : base("Login")
         {
@@ -25,7 +23,7 @@ namespace Falcon.Client.Features.Auth.UI
             {
                 new MenuBarItem("App", new MenuItem []
                 {
-                    new MenuItem("Quit", "Quit App", () => OnQuit?.Invoke(), null, null, Key.Q | Key.CtrlMask)
+                    new MenuItem("Quit", "Quit App", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
                 }),
                 new MenuBarItem("Help", new MenuItem[]
                 {
@@ -91,6 +89,7 @@ namespace Falcon.Client.Features.Auth.UI
                 progressBar.Pulse();
                 return true;
             }
+
             loginButton.Clicked += async () =>
             {
                 if (nameText.Text.ToString().TrimStart().Length == 0)
@@ -125,7 +124,7 @@ namespace Falcon.Client.Features.Auth.UI
 
             exitButton.Clicked += () =>
             {
-                OnExit?.Invoke();
+                Application.RequestStop();
             };
         }
     }

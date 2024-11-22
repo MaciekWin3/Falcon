@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Server", "Falcon.Server\Falcon.Server.csproj", "{22729EF4-2D51-4054-868B-A059AF8DAE3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Server", "src\server\Falcon.Server\Falcon.Server.csproj", "{22729EF4-2D51-4054-868B-A059AF8DAE3B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Client", "Falcon.Client\Falcon.Client.csproj", "{276C5734-EDC5-47A0-9B47-45354B37B341}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Client", "src\client\Falcon.Client\Falcon.Client.csproj", "{276C5734-EDC5-47A0-9B47-45354B37B341}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Server.Tests", "Falcon.Server.Tests\Falcon.Server.Tests.csproj", "{A6DA14E8-E389-4497-91A9-CBE2996953EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Server.Tests", "src\server\Falcon.Server.Tests\Falcon.Server.Tests.csproj", "{A6DA14E8-E389-4497-91A9-CBE2996953EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Client.Tests", "Falcon.Client.Tests\Falcon.Client.Tests.csproj", "{8C26662D-5C21-45DF-9DD4-E357F9E37687}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Falcon.Client.Tests", "src\client\Falcon.Client.Tests\Falcon.Client.Tests.csproj", "{8C26662D-5C21-45DF-9DD4-E357F9E37687}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A1394917-4A6D-4215-A0AD-92894D3C3D1B}"
 	ProjectSection(SolutionItems) = preProject

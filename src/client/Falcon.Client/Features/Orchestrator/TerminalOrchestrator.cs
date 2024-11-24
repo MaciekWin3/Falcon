@@ -2,7 +2,6 @@
 using Falcon.Client.Features.Auth.UI;
 using Falcon.Client.Features.Chat;
 using Falcon.Client.Features.Chat.UI;
-using Falcon.Client.Features.Lobby.UI;
 using Falcon.Client.Features.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,68 +30,40 @@ namespace Falcon.Client
         public void InitApp()
         {
             Application.Init();
-            //Colors.Base.Normal = Application.Driver.MakeAttribute(Color.BrightGreen, Color.Black);
-            Colors.Base = Colors.TopLevel;
-            Console.OutputEncoding = System.Text.Encoding.Default;
-            ShowLoginWindow();
-            Application.Run();
+            Application.Run(CreateLoginWindow());
             Application.Shutdown();
+            Console.OutputEncoding = System.Text.Encoding.Default;
         }
 
-        private void ShowLoginWindow()
+        public void ChangeWindow(Window window)
         {
-            Application.Top.RemoveAll();
-            var top = Application.Top;
-            var loginWindow = new LoginWindow
+            Application.RequestStop();
+            Application.Run(window);
+        }
+
+        private LoginWindow CreateLoginWindow()
+        {
+            var loginWindow = serviceProvider.GetService<LoginWindow>();
+            loginWindow.OnAuthorize = authService.LoginAsync;
+            loginWindow.OnLogin = async (token) =>
             {
-                OnAuthorize = authService.LoginAsync,
-
-                OnLogin = async (token) =>
+                await signalRClient.StartConnectionAsync(token);
+                Application.Invoke(async () =>
                 {
-                    await signalRClient.StartConnectionAsync(token);
-                    Application.MainLoop.Invoke(async () =>
-                    {
-                        await ShowRoomWindow();
-                    });
-                },
+                    var room = "All";
+                    await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: [room]);
+                    var chatWindow = CreateChatWindow();
+                    ChangeWindow(chatWindow);
+                });
             };
-            top.Add(loginWindow);
-            top.Add(loginWindow.CreateMenuBar());
-            Application.Refresh();
+
+            return loginWindow;
         }
 
-        private async Task ShowRoomWindow()
+        private ChatWindow CreateChatWindow()
         {
-            Application.Top.RemoveAll();
-            var top = Application.Top;
-            IList<string> rooms = new List<string>();
-            rooms = await chatService.GetListOfRoomAsync();
-            var win = new LobbyWindow(rooms)
-            {
-                OnChatOpen = async (room) =>
-                {
-                    if (room == "Create new room")
-                    {
-                        // TODO: Popup with creating new chat
-                        throw new NotImplementedException();
-                    }
-                    await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: new[] { room });
-                    ShowChatWindowNew();
-                },
-            };
-            top.Add(win);
-            top.Add(win.CreateMenuBar());
-            Application.Refresh();
-        }
-
-        private void ShowChatWindowNew()
-        {
-            Application.Top.RemoveAll();
-            var top = Application.Top;
-            var win = serviceProvider.GetService<ChatWindow>();
-            top.Add(win);
-            top.Add(win.CreateMenuBar());
-            Application.Refresh();
+            var chatWindow = serviceProvider.GetService<ChatWindow>();
+            return chatWindow;
         }
     }
 }

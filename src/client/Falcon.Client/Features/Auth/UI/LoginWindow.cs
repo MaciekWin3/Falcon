@@ -8,8 +8,9 @@ namespace Falcon.Client.Features.Auth.UI
         public Func<User, Task<string>> OnAuthorize { get; set; }
         public Action<string> OnLogin { get; set; }
 
-        public LoginWindow() : base("Login")
+        public LoginWindow()
         {
+            Title = "Login";
             X = Pos.Center();
             Y = 1;
             Width = Dim.Fill();
@@ -19,23 +20,31 @@ namespace Falcon.Client.Features.Auth.UI
 
         public MenuBar CreateMenuBar()
         {
-            return new MenuBar(new MenuBarItem[]
+            return new MenuBar
             {
-                new MenuBarItem("App", new MenuItem []
+                Data = new MenuBarItem[]
                 {
-                    new MenuItem("Quit", "Quit App", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
-                }),
-                new MenuBarItem("Help", new MenuItem[]
-                {
-                    new MenuItem("About", "About", () => MessageBox.Query(50, 5, "Hi!", "Application created by Maciej Winnik", "Ok"), null, null, Key.Q | Key.CtrlMask)
-                })
-            });
+                    new MenuBarItem("_File", new MenuItem[]
+                    {
+                        new MenuItem("_Quit", "", () => Application.RequestStop(), null, null)
+                    }),
+                    new MenuBarItem("_Help", new MenuItem[]
+                    {
+                        new MenuItem("_About", "", () => MessageBox.Query(50, 5, "Hi!", "Application created by Maciej Winnik", "Ok"), null, null)
+                    })
+                }
+            };
         }
 
         public void Setup()
         {
-            var nameLabel = new Label(0, 1, "Nickname");
-            var nameText = new TextField("")
+            var nameLabel = new Label
+            {
+                X = 0,
+                Y = 1,
+                Text = "Nickname",
+            };
+            var nameText = new TextField
             {
                 X = Pos.Left(nameLabel),
                 Y = Pos.Top(nameLabel) + 1,
@@ -45,14 +54,15 @@ namespace Falcon.Client.Features.Auth.UI
             Add(nameLabel);
             Add(nameText);
 
-            var passwordLabel = new Label("Password")
+            var passwordLabel = new Label
             {
+                Text = "Password",
                 X = Pos.Left(nameText),
                 Y = Pos.Top(nameText) + 1,
                 Width = Dim.Fill()
             };
 
-            var passwordText = new TextField("")
+            var passwordText = new TextField
             {
                 X = Pos.Left(passwordLabel),
                 Y = Pos.Top(passwordLabel) + 1,
@@ -63,14 +73,16 @@ namespace Falcon.Client.Features.Auth.UI
             Add(passwordLabel);
             Add(passwordText);
 
-            var loginButton = new Button("Login", true)
+            var loginButton = new Button
             {
+                Text = "Login",
                 Y = Pos.Top(passwordText) + 2,
                 X = Pos.Center() - 15
             };
 
-            var exitButton = new Button("Exit")
+            var exitButton = new Button
             {
+                Text = "Exit",
                 Y = Pos.Top(loginButton),
                 X = Pos.Center() + 5
             };
@@ -84,13 +96,14 @@ namespace Falcon.Client.Features.Auth.UI
                 X = Pos.Center(),
                 Width = 20
             };
-            bool Timer(MainLoop caller)
+
+            bool Timer()
             {
                 progressBar.Pulse();
                 return true;
             }
 
-            loginButton.Clicked += async () =>
+            loginButton.Accept += async (_, _) =>
             {
                 if (nameText.Text.ToString().TrimStart().Length == 0)
                 {
@@ -105,12 +118,12 @@ namespace Falcon.Client.Features.Auth.UI
                 }
 
                 Add(progressBar);
-                var x = Application.MainLoop.AddTimeout(TimeSpan.FromMilliseconds(300), Timer);
+                var x = Application.AddTimeout(TimeSpan.FromMilliseconds(300), Timer);
                 var user = new User(username: nameText.Text.ToString(), password: passwordText.Text.ToString());
 
                 var token = await OnAuthorize.Invoke(user);
 
-                Application.MainLoop.RemoveTimeout(x);
+                Application.RemoveTimeout(x);
                 Remove(progressBar);
                 if (string.IsNullOrEmpty(token))
                 {
@@ -122,7 +135,7 @@ namespace Falcon.Client.Features.Auth.UI
                 }
             };
 
-            exitButton.Clicked += () =>
+            exitButton.Accept += (_, _) =>
             {
                 Application.RequestStop();
             };

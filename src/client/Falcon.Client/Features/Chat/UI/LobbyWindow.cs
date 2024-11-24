@@ -8,44 +8,59 @@ namespace Falcon.Client.Features.Lobby.UI
         private readonly IList<string> rooms;
         public Action<string> OnChatOpen { get; set; }
 
-        public LobbyWindow(IList<string> rooms) : base("Choose Room")
+        public LobbyWindow()
         {
+            Title = "Choose Room";
             X = 0;
             Y = 1;
             Width = Dim.Fill();
             Height = Dim.Fill();
-            this.rooms = rooms;
+            rooms = new List<string> { "All", "Admins" };
             Setup();
         }
 
         public void Setup()
         {
-            RoomListView = new ListView(rooms.ToList())
+            RoomListView = new ListView
             {
                 X = 0,
                 Y = 1,
-                Width = Dim.Fill(0),
-                Height = Dim.Fill(0),
+                Width = Dim.Fill(),
+                Height = Dim.Fill(),
                 AllowsMarking = false,
                 CanFocus = true,
+                Data = rooms.ToList()
             };
 
             RoomListView.OpenSelectedItem += OpenChat;
-            Add(RoomListView);
+
+            //Add(RoomListView);
+            var button = new Button
+            {
+                Text = "Open Chat",
+                X = Pos.Center(),
+                Y = Pos.Center()
+            };
+
+            button.Accept += (_, _) => OpenChat(this, null);
+            Add(button);
         }
 
         public MenuBar CreateMenuBar()
         {
-            return new MenuBar(new MenuBarItem[]
+            return new MenuBar
             {
-                new MenuBarItem("App", new MenuItem []
+                Data = new MenuBarItem[]
                 {
-                    new MenuItem("Quit", "Quit App", () => Application.RequestStop(), null, null, Key.Q | Key.CtrlMask)
-                })
-            });
+                    new MenuBarItem("_App", new MenuItem[]
+                    {
+                        new MenuItem("_Quit", "", () => Application.RequestStop())
+                    })
+                }
+            };
         }
 
-        public void OpenChat(EventArgs e)
+        public void OpenChat(object sender, ListViewItemEventArgs e)
         {
             string room = RoomListView.SelectedItem.ToString();
             OnChatOpen?.Invoke(room);

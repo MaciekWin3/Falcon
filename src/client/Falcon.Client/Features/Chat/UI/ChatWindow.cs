@@ -1,5 +1,6 @@
 ﻿using Falcon.Client.Features.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
+using System.Collections.ObjectModel;
 using Terminal.Gui;
 
 namespace Falcon.Client.Features.Chat.UI
@@ -14,19 +15,20 @@ namespace Falcon.Client.Features.Chat.UI
         private readonly SignalRClient signalRClient;
         private readonly ChatService chatService;
 
-        public ChatWindow(SignalRClient signalRClient, ChatService chatService) : base("Falcon")
+        public ChatWindow(SignalRClient signalRClient, ChatService chatService)
         {
             this.signalRClient = signalRClient;
             this.chatService = chatService;
+            Title = "Falon";
             X = 0;
             Y = 1;
             Width = Dim.Fill();
             Height = Dim.Fill();
             Setup("Chat");
-            this.signalRClient.OnReceiveMessage += OnReceiveMessageListener;
+            this.signalRClient.OnReceiveMessage += AddMessageToChat;
             this.signalRClient.OnConnect += OnConnectLister;
             this.signalRClient.OnDisconnect += OnDisconnectLister;
-            chatListView.SetSource(messages);
+            chatListView.SetSource(new ObservableCollection<string>(messages));
         }
 
         private async void OnConnectLister()
@@ -41,29 +43,18 @@ namespace Falcon.Client.Features.Chat.UI
             Application.Refresh();
         }
 
-        private void OnReceiveMessageListener(string userName, string message)
-        {
-            ConnectionLister(userName, message);
-        }
-
-        private static void ConnectionLister(string userName, string message)
-        {
-            messages.Add($"{userName}: {message}");
-            chatListView.MoveEnd();
-            chatListView.GetCurrentHeight(out int h);
-            chatListView.ScrollUp(h - 1);
-            Application.Refresh();
-        }
-
         public MenuBar CreateMenuBar()
         {
-            return new MenuBar(new MenuBarItem[]
+            return new MenuBar
             {
-                new MenuBarItem("App", new MenuItem []
+                Data = new MenuBarItem[]
                 {
-                    new MenuItem("Quit", "Quit App", () => Application.RequestStop(), null, null, Key.CtrlMask | Key.Q)
-                })
-            });
+                    new MenuBarItem("_App", new MenuItem[]
+                    {
+                        new MenuItem("_Quit", "", () => Application.RequestStop(), null, null)
+                    })
+                }
+            };
         }
 
         public void ExecuteCommand(string command)
@@ -82,8 +73,9 @@ namespace Falcon.Client.Features.Chat.UI
 
         public void Setup(string text)
         {
-            var chatViewFrame = new FrameView(text)
+            var chatViewFrame = new FrameView
             {
+                Title = text,
                 X = 0,
                 Y = 0,
                 Width = Dim.Percent(75),
@@ -103,8 +95,9 @@ namespace Falcon.Client.Features.Chat.UI
             chatViewFrame.Add(chatListView);
             Add(chatViewFrame);
 
-            var userListFrame = new FrameView("Online Users")
+            var userListFrame = new FrameView
             {
+                Text = "Online Users",
                 X = Pos.Right(chatViewFrame),
                 Y = 0,
                 Width = Dim.Fill(),
@@ -119,15 +112,16 @@ namespace Falcon.Client.Features.Chat.UI
             userListFrame.Add(userList);
             Add(userListFrame);
 
-            var chatBar = new FrameView("Message")
+            var chatBar = new FrameView
             {
+                Title = "Message",
                 X = 0,
                 Y = Pos.Bottom(chatViewFrame),
                 Width = chatViewFrame.Width,
                 Height = Dim.Fill()
             };
 
-            chatMessage = new TextField(string.Empty)
+            chatMessage = new TextField
             {
                 X = 0,
                 Y = Pos.Center(),
@@ -136,11 +130,11 @@ namespace Falcon.Client.Features.Chat.UI
             };
 
             // Test
-            userList.SetSource(users);
+            userList.SetSource(new ObservableCollection<string>(users));
 
-            chatMessage.KeyPress += (a) =>
+            chatMessage.KeyDown += (_, a) =>
             {
-                if (a.KeyEvent.Key == Key.Enter)
+                if (a.KeyCode == Key.Enter)
                 {
                     string message = chatMessage.Text.ToString();
                     if (!string.IsNullOrEmpty(message) && message[0] == '/')
@@ -149,18 +143,23 @@ namespace Falcon.Client.Features.Chat.UI
                     }
                     else
                     {
-                        messages.Add($"You: {message ?? ""}");
+                        AddMessageToChat("You", message);
                         signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
                         chatMessage.Text = string.Empty;
-                        chatListView.MoveEnd();
-                        chatListView.GetCurrentHeight(out int h);
-                        chatListView.ScrollUp(h - 1);
                         a.Handled = true;
                     }
                 }
             };
             chatBar.Add(chatMessage);
             Add(chatBar);
+        }
+
+        private void AddMessageToChat(string user, string message)
+        {
+            messages.Add($"{user}: {message ?? ""}");
+            chatListView.SetSource(new ObservableCollection<string>(messages));
+            chatListView.MoveEnd();
+            Application.Refresh();
         }
     }
 }

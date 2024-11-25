@@ -33,7 +33,7 @@ namespace Falcon.Client.Features.Chat
             }
             else
             {
-                // todo: handle it
+                // TODO: handle it
                 Environment.Exit(0);
             }
             await connection.StartAsync();

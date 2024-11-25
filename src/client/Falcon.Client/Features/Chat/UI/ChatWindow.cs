@@ -39,16 +39,16 @@ namespace Falcon.Client.Features.Chat.UI
 
             // SignalR
             this.signalRClient.OnReceiveMessage += AddMessageToChat;
-            this.signalRClient.OnConnect += OnConnectLister;
-            this.signalRClient.OnDisconnect += OnDisconnectLister;
+            this.signalRClient.OnConnected += OnConnectLister;
+            this.signalRClient.OnDisconnected += OnDisconnectLister;
 
             //messages = await chatService.GetMessagesAsync();
             var x = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveRooms").Result;
-            //var y = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveUsers").Result;
+            var y = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveUsers").Result;
 
             chatListView.SetSource(new ObservableCollection<string>(messages));
             roomsListView.SetSource(new ObservableCollection<string>(x));
-            //userListView.SetSource(new ObservableCollection<string>(y));
+            userListView.SetSource(new ObservableCollection<string>(y));
         }
 
         #region User interface
@@ -177,9 +177,11 @@ namespace Falcon.Client.Features.Chat.UI
 
         #endregion
 
-        private async void OnConnectLister()
+        private async void OnConnectLister(string username)
         {
-            users = await chatService.GetUsersAsync();
+            // TODO: Verify how to get users
+            //users = await chatService.GetUsersAsync();
+            //userListView.SetSource(new ObservableCollection<string>(users));
             Application.Refresh();
         }
 

@@ -7,29 +7,175 @@ namespace Falcon.Client.Features.Chat.UI
 {
     public class ChatWindow : Window
     {
-        private static readonly List<string> messages = new();
-        private static List<string> users = new();
+        const int CHAT_WINDOW_HEIGHT = 3;
+
+        // Components
+        private static ListView roomsListView;
         private static ListView chatListView;
-        private static ListView userList;
-        private static TextField chatMessage;
+        private static ListView userListView;
+        private static TextField chatMessagePromptView;
+
+        // Data
+        private static List<string> messages = [];
+        private static List<string> users = ["John", "Luke", "Barry"];
+        private static List<string> rooms = ["Admins", "Users"];
+
+        // Services
         private readonly SignalRClient signalRClient;
         private readonly ChatService chatService;
 
         public ChatWindow(SignalRClient signalRClient, ChatService chatService)
         {
+            // Services
             this.signalRClient = signalRClient;
             this.chatService = chatService;
-            Title = "Falon";
+
+            // Window
             X = 0;
             Y = 1;
             Width = Dim.Fill();
             Height = Dim.Fill();
-            Setup("Chat");
+            Setup();
+
+            // SignalR
             this.signalRClient.OnReceiveMessage += AddMessageToChat;
             this.signalRClient.OnConnect += OnConnectLister;
             this.signalRClient.OnDisconnect += OnDisconnectLister;
+
+            //messages = await chatService.GetMessagesAsync();
+            var x = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveRooms").Result;
+            //var y = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveUsers").Result;
+
             chatListView.SetSource(new ObservableCollection<string>(messages));
+            roomsListView.SetSource(new ObservableCollection<string>(x));
+            //userListView.SetSource(new ObservableCollection<string>(y));
         }
+
+        #region User interface
+        public void Setup()
+        {
+            // Rooms
+            var roomsListFrame = new FrameView
+            {
+                Title = "Rooms",
+                X = 0,
+                Y = 0,
+                Width = Dim.Percent(20),
+                Height = Dim.Fill(),
+            };
+
+            roomsListView = new ListView
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill(),
+            };
+
+            roomsListFrame.Add(roomsListView);
+            Add(roomsListFrame);
+
+            // Chat
+            var chatFrameView = new FrameView
+            {
+                Title = "Chat",
+                X = Pos.Right(roomsListFrame),
+                Y = 0,
+                Width = Dim.Percent(60),
+                Height = Dim.Fill() - CHAT_WINDOW_HEIGHT,
+            };
+
+            chatListView = new ListView
+            {
+                X = 0,
+                Y = 0,
+                Width = Dim.Fill(),
+                Height = Dim.Fill(),
+            };
+
+            chatFrameView.Add(chatListView);
+            Add(chatFrameView);
+
+
+            // Users
+            var userListFrame = new FrameView
+            {
+                Title = "Users",
+                X = Pos.Right(chatFrameView),
+                Y = 0,
+                Width = Dim.Percent(20),
+                Height = Dim.Fill(),
+            };
+
+            userListView = new ListView()
+            {
+                Width = Dim.Fill(),
+                Height = Dim.Fill(),
+            };
+
+            userListFrame.Add(userListView);
+            Add(userListFrame);
+
+            var chatBar = new FrameView
+            {
+                Title = "Message",
+                X = Pos.Right(roomsListFrame),
+                Y = Pos.Bottom(chatFrameView),
+                Width = Dim.Percent(60),
+                Height = CHAT_WINDOW_HEIGHT
+            };
+
+            chatMessagePromptView = new TextField
+            {
+                X = 0,
+                Y = Pos.Center(),
+                Width = Dim.Fill(),
+                Height = Dim.Fill()
+            };
+
+            // Test
+            userListView.SetSource(new ObservableCollection<string>(users));
+
+            chatMessagePromptView.KeyDown += (_, a) =>
+            {
+                if (a.KeyCode == Key.Enter)
+                {
+                    string message = chatMessagePromptView.Text.ToString();
+                    if (!string.IsNullOrEmpty(message) && message[0] == '/')
+                    {
+                        ExecuteCommand(message);
+                    }
+                    else
+                    {
+                        AddMessageToChat("You", message);
+                        signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
+                        chatMessagePromptView.Text = string.Empty;
+                        a.Handled = true;
+                    }
+                }
+            };
+
+            chatBar.Add(chatMessagePromptView);
+            Add(chatBar);
+            //Add(CreateMenuBar());
+        }
+
+        public MenuBar CreateMenuBar()
+        {
+            // TODO: Add menu bar
+            return new MenuBar
+            {
+                Data = new MenuBarItem[]
+                {
+                    new MenuBarItem("_App", new MenuItem[]
+                    {
+                        new MenuItem("_Quit", "", () => Application.RequestStop(), null, null)
+                    })
+                }
+            };
+        }
+
+        #endregion
 
         private async void OnConnectLister()
         {
@@ -43,115 +189,18 @@ namespace Falcon.Client.Features.Chat.UI
             Application.Refresh();
         }
 
-        public MenuBar CreateMenuBar()
-        {
-            return new MenuBar
-            {
-                Data = new MenuBarItem[]
-                {
-                    new MenuBarItem("_App", new MenuItem[]
-                    {
-                        new MenuItem("_Quit", "", () => Application.RequestStop(), null, null)
-                    })
-                }
-            };
-        }
-
         public void ExecuteCommand(string command)
         {
             switch (command)
             {
                 case "/clear":
                     messages.Clear();
-                    chatMessage.Text = string.Empty;
+                    chatMessagePromptView.Text = string.Empty;
                     chatListView.MovePageUp();
                     break;
                 default:
                     break;
             }
-        }
-
-        public void Setup(string text)
-        {
-            var chatViewFrame = new FrameView
-            {
-                Title = text,
-                X = 0,
-                Y = 0,
-                Width = Dim.Percent(75),
-                Height = Dim.Percent(80),
-            };
-
-            chatListView = new ListView
-            {
-                X = 0,
-                Y = 0,
-                Width = Dim.Fill(),
-                Height = Dim.Fill(),
-                CanFocus = false,
-                AllowsMarking = false,
-            };
-
-            chatViewFrame.Add(chatListView);
-            Add(chatViewFrame);
-
-            var userListFrame = new FrameView
-            {
-                Text = "Online Users",
-                X = Pos.Right(chatViewFrame),
-                Y = 0,
-                Width = Dim.Fill(),
-                Height = Dim.Fill(),
-            };
-            userList = new ListView()
-            {
-                Width = Dim.Fill(),
-                Height = Dim.Fill(),
-                CanFocus = false
-            };
-            userListFrame.Add(userList);
-            Add(userListFrame);
-
-            var chatBar = new FrameView
-            {
-                Title = "Message",
-                X = 0,
-                Y = Pos.Bottom(chatViewFrame),
-                Width = chatViewFrame.Width,
-                Height = Dim.Fill()
-            };
-
-            chatMessage = new TextField
-            {
-                X = 0,
-                Y = Pos.Center(),
-                Width = Dim.Fill(),
-                Height = Dim.Fill()
-            };
-
-            // Test
-            userList.SetSource(new ObservableCollection<string>(users));
-
-            chatMessage.KeyDown += (_, a) =>
-            {
-                if (a.KeyCode == Key.Enter)
-                {
-                    string message = chatMessage.Text.ToString();
-                    if (!string.IsNullOrEmpty(message) && message[0] == '/')
-                    {
-                        ExecuteCommand(message);
-                    }
-                    else
-                    {
-                        AddMessageToChat("You", message);
-                        signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
-                        chatMessage.Text = string.Empty;
-                        a.Handled = true;
-                    }
-                }
-            };
-            chatBar.Add(chatMessage);
-            Add(chatBar);
         }
 
         private void AddMessageToChat(string user, string message)

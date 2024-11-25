@@ -42,6 +42,9 @@ namespace Falcon.Server.Features.Hubs
             var user = Context.UserIdentifier;
             Connections.Add(Context.ConnectionId, new UserConnection(user, "All"));
             logger.LogInformation("Connection established: {0}, user: {1}", Context.ConnectionId, user);
+
+            Clients.All.OnConnected(user);
+
             return base.OnConnectedAsync();
         }
 
@@ -55,6 +58,7 @@ namespace Falcon.Server.Features.Hubs
             {
                 Connections.Remove(Context.ConnectionId);
                 Clients.Group(userConnection.Room).ReceiveMessage(falconBot, $"{userConnection.Username} has left");
+                Clients.All.OnDisconnected(userConnection.Username);
             }
             logger.LogInformation("Connection closed: {0}, user: {1}", Context.ConnectionId, Context.UserIdentifier);
             return base.OnDisconnectedAsync(exception);
@@ -87,7 +91,7 @@ namespace Falcon.Server.Features.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
             // Check if this is working
-            await Clients.Group(room).Connected(Context.UserIdentifier);
+            await Clients.Group(room).OnConnected(Context.UserIdentifier);
             await Clients.Group(room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has joined {room}");
             logger.LogInformation("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
@@ -104,7 +108,7 @@ namespace Falcon.Server.Features.Hubs
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, null);
             await Clients.Group(userConnection.Room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has left {userConnection.Room}");
-            await Clients.Group(userConnection.Room).Disconected(Context.UserIdentifier);
+            await Clients.Group(userConnection.Room).OnDisconnected(Context.UserIdentifier);
             logger.LogInformation("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
         }
 
@@ -126,6 +130,20 @@ namespace Falcon.Server.Features.Hubs
             string room = GetUserGroup();
             var users = Connections.Values
                .Where(c => c.Room == room)
+               .Select(c => c.Username)
+               .ToList();
+
+            return users;
+        }
+
+        /// <summary>
+        /// Retrieves a list of active users.
+        /// </summary>
+        [SignalRMethod("ShowActiveUsers")]
+        public List<string> ShowActiveUsers()
+        {
+            string room = GetUserGroup();
+            var users = Connections.Values
                .Select(c => c.Username)
                .ToList();
 
@@ -186,6 +204,7 @@ namespace Falcon.Server.Features.Hubs
                 await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
             }
         }
+
         #endregion
 
         #region Helper Methods

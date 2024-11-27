@@ -16,9 +16,9 @@ namespace Falcon.Client.Features.Chat.UI
         private static TextField chatMessagePromptView;
 
         // Data
-        private static List<string> messages = [];
-        private static HashSet<string> users = [];
-        private static HashSet<string> rooms = ["Admins", "Users"];
+        private List<string> messages = [];
+        private HashSet<string> users = [];
+        private HashSet<string> rooms = ["Admins", "Users"];
 
         // Services
         private readonly SignalRClient signalRClient;
@@ -42,18 +42,48 @@ namespace Falcon.Client.Features.Chat.UI
 
             // SignalR
             this.signalRClient.OnReceiveMessage += AddMessageToChat;
-            this.signalRClient.OnConnected += OnConnectLister;
-            this.signalRClient.OnDisconnected += OnDisconnectLister;
+            this.signalRClient.OnConnected += async () => await HandleConnectionStatusChangeAsync();
+            this.signalRClient.OnDisconnected += async () => await HandleConnectionStatusChangeAsync();
 
-            //messages = await chatService.GetMessagesAsync();
-            //var z = chatService.GetUsersAsync().Result;
-            //users = new HashSet<string>(z);
-            var x = signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveRooms").Result;
-            var y = signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers").Result;
 
-            chatListView.SetSource(new ObservableCollection<string>(messages));
-            roomsListView.SetSource(new ObservableCollection<string>(x));
-            userListView.SetSource(new ObservableCollection<string>(y));
+            // Initialize data asynchronously
+            _ = InitializeAsync();
+        }
+
+        private async Task InitializeAsync()
+        {
+            try
+            {
+                // TODO: For future implementation
+                //var initialMessages = await chatService.GetMessagesAsync();
+                var activeRooms = await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveRooms");
+                var activeUsers = await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers");
+
+                // Update UI sources
+                Application.Invoke(() =>
+                {
+                    chatListView.SetSource(new ObservableCollection<string>(messages));
+
+                    rooms.Clear();
+                    foreach (var room in activeRooms)
+                    {
+                        rooms.Add(room);
+                    }
+
+                    roomsListView.SetSource(new ObservableCollection<string>(rooms));
+
+                    users.Clear();
+                    foreach (var user in activeUsers)
+                    {
+                        users.Add(user);
+                    }
+                    userListView.SetSource(new ObservableCollection<string>(users));
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.ErrorQuery(40, 10, "Error", ex.Message, "Ok");
+            }
         }
 
         #region User interface
@@ -149,11 +179,13 @@ namespace Falcon.Client.Features.Chat.UI
                     if (!string.IsNullOrEmpty(message) && message[0] == '/')
                     {
                         ExecuteCommand(message);
+                        chatMessagePromptView.Text = string.Empty;
+                        a.Handled = true;
                     }
                     else
                     {
                         AddMessageToChat("You", message);
-                        signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: new[] { message });
+                        signalRClient.connection.InvokeCoreAsync("SendGroupMessageAsync", args: [message]);
                         chatMessagePromptView.Text = string.Empty;
                         a.Handled = true;
                     }
@@ -182,18 +214,32 @@ namespace Falcon.Client.Features.Chat.UI
 
         #endregion
 
-        private async Task OnConnectLister()
+
+        private async Task HandleConnectionStatusChangeAsync()
         {
-            users = await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers");
-            userListView.SetSource(new ObservableCollection<string>(users));
-            Application.Refresh();
+            try
+            {
+                var activeUsers = await FetchActiveUsersAsync();
+                userListView.SetSource(new ObservableCollection<string>(activeUsers));
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions appropriately
+                Console.WriteLine($"Error during connection status change: {ex.Message}");
+            }
         }
 
-        private async Task OnDisconnectLister()
+        private async Task<HashSet<string>> FetchActiveUsersAsync()
         {
-            users = await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers");
-            userListView.SetSource(new ObservableCollection<string>(users));
-            Application.Refresh();
+            try
+            {
+                return await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching active users: {ex.Message}");
+                return new HashSet<string>();
+            }
         }
 
         public void ExecuteCommand(string command)
@@ -202,7 +248,6 @@ namespace Falcon.Client.Features.Chat.UI
             {
                 case "/clear":
                     messages.Clear();
-                    chatMessagePromptView.Text = string.Empty;
                     chatListView.MovePageUp();
                     break;
                 default:

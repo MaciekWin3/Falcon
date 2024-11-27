@@ -33,7 +33,7 @@ namespace Falcon.Client.Features.Chat
             }
             else
             {
-                // todo: handle it
+                // TODO: handle it
                 Environment.Exit(0);
             }
             await connection.StartAsync();
@@ -66,7 +66,7 @@ namespace Falcon.Client.Features.Chat
 
         public async Task<List<string>> GetUsersAsync()
         {
-            var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
+            var users = await connection.InvokeAsync<List<string>>("ShowActiveUsers");
             return users;
         }
     }

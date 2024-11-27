@@ -37,27 +37,33 @@ namespace Falcon.Server.Features.Hubs
         /// Connects user to server.
         /// </summary>
         [SignalRMethod("OnConnectedAsync")]
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
             var user = Context.UserIdentifier;
             Connections.Add(Context.ConnectionId, new UserConnection(user, "All"));
             logger.LogInformation("Connection established: {0}, user: {1}", Context.ConnectionId, user);
-            return base.OnConnectedAsync();
+
+            await Clients.All.OnConnected();
+
+            _ = base.OnConnectedAsync();
         }
 
         /// <summary>
         /// Runs when user is dissconected from server.
         /// </summary>
         [SignalRMethod("OnDisconnectedAsync")]
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
             if (Connections.TryGetValue(Context.ConnectionId, out UserConnection userConnection))
             {
                 Connections.Remove(Context.ConnectionId);
-                Clients.Group(userConnection.Room).ReceiveMessage(falconBot, $"{userConnection.Username} has left");
+                // TODO: Check for await
+                //await Clients.Group(userConnection.Room).ReceiveMessage(falconBot, $"{userConnection.Username} has left");
+                await Clients.Group(userConnection.Room).ReceiveMessage(falconBot, $"{userConnection.Username} has left");
+                await Clients.All.OnDisconnected();
             }
             logger.LogInformation("Connection closed: {0}, user: {1}", Context.ConnectionId, Context.UserIdentifier);
-            return base.OnDisconnectedAsync(exception);
+            _ = base.OnDisconnectedAsync(exception);
         }
         #endregion
 
@@ -87,7 +93,7 @@ namespace Falcon.Server.Features.Hubs
             await Groups.AddToGroupAsync(Context.ConnectionId, room);
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, room);
             // Check if this is working
-            await Clients.Group(room).Connected(Context.UserIdentifier);
+            await Clients.Group(room).OnConnected();
             await Clients.Group(room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has joined {room}");
             logger.LogInformation("User: {0}, with Id: {1} joined room {2}", Context.UserIdentifier, Context.ConnectionId, room);
@@ -104,7 +110,7 @@ namespace Falcon.Server.Features.Hubs
             Connections[Context.ConnectionId] = new UserConnection(Context.UserIdentifier, null);
             await Clients.Group(userConnection.Room).ReceiveMessage(falconBot,
                 $"{Context.UserIdentifier} has left {userConnection.Room}");
-            await Clients.Group(userConnection.Room).Disconected(Context.UserIdentifier);
+            await Clients.Group(userConnection.Room).OnDisconnected();
             logger.LogInformation("User: {0}, with Id: {1} left room {2}", Context.UserIdentifier, Context.ConnectionId, userConnection.Room);
         }
 
@@ -112,24 +118,35 @@ namespace Falcon.Server.Features.Hubs
         /// Retrieves a list of active chat rooms.
         /// </summary>
         [SignalRMethod("ShowActiveRooms")]
-        public List<string> ShowActiveRooms()
-        {
-            return Rooms.ToList();
-        }
+        public HashSet<string> ShowActiveRooms() => Rooms;
 
         /// <summary>
         /// Retrieves a list of users in the user's current chat room.
         /// </summary>
         [SignalRMethod("ShowUsersInRoom")]
-        public List<string> ShowUsersInRoom()
+        public HashSet<string> ShowUsersInRoom()
         {
             string room = GetUserGroup();
             var users = Connections.Values
                .Where(c => c.Room == room)
                .Select(c => c.Username)
-               .ToList();
+               .Distinct();
 
-            return users;
+            return new HashSet<string>(users);
+        }
+
+        /// <summary>
+        /// Retrieves a list of active users.
+        /// </summary>
+        [SignalRMethod("ShowActiveUsers")]
+        public HashSet<string> ShowActiveUsers()
+        {
+            string room = GetUserGroup();
+            var users = Connections.Values
+               .Select(c => c.Username)
+               .Distinct();
+
+            return new HashSet<string>(users);
         }
 
         /// <summary>
@@ -186,6 +203,7 @@ namespace Falcon.Server.Features.Hubs
                 await messageService.CreateAsync(new Message { Content = encryptedAndCompressedMessage });
             }
         }
+
         #endregion
 
         #region Helper Methods

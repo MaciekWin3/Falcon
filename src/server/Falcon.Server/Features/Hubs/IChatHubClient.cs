@@ -4,8 +4,8 @@
     {
         Task ReceiveMessage(string user, string message);
 
-        Task Connected(string username);
+        Task OnConnected();
 
-        Task Disconected(string username);
+        Task OnDisconnected();
     }
 }

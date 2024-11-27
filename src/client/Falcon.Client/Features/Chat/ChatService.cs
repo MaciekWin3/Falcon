@@ -66,7 +66,7 @@ namespace Falcon.Client.Features.Chat
 
         public async Task<List<string>> GetUsersAsync()
         {
-            var users = await connection.InvokeAsync<List<string>>("ShowUsersInRoom");
+            var users = await connection.InvokeAsync<List<string>>("ShowActiveUsers");
             return users;
         }
     }

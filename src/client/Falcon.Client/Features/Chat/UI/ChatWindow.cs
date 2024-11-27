@@ -17,8 +17,8 @@ namespace Falcon.Client.Features.Chat.UI
 
         // Data
         private static List<string> messages = [];
-        private static List<string> users = ["John", "Luke", "Barry"];
-        private static List<string> rooms = ["Admins", "Users"];
+        private static HashSet<string> users = [];
+        private static HashSet<string> rooms = ["Admins", "Users"];
 
         // Services
         private readonly SignalRClient signalRClient;
@@ -30,11 +30,14 @@ namespace Falcon.Client.Features.Chat.UI
             this.signalRClient = signalRClient;
             this.chatService = chatService;
 
+            Application.Top.Add(CreateMenuBar());
+
             // Window
             X = 0;
             Y = 1;
             Width = Dim.Fill();
             Height = Dim.Fill();
+
             Setup();
 
             // SignalR
@@ -43,8 +46,10 @@ namespace Falcon.Client.Features.Chat.UI
             this.signalRClient.OnDisconnected += OnDisconnectLister;
 
             //messages = await chatService.GetMessagesAsync();
-            var x = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveRooms").Result;
-            var y = signalRClient.connection.InvokeAsync<IList<string>>("ShowActiveUsers").Result;
+            //var z = chatService.GetUsersAsync().Result;
+            //users = new HashSet<string>(z);
+            var x = signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveRooms").Result;
+            var y = signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers").Result;
 
             chatListView.SetSource(new ObservableCollection<string>(messages));
             roomsListView.SetSource(new ObservableCollection<string>(x));
@@ -177,17 +182,17 @@ namespace Falcon.Client.Features.Chat.UI
 
         #endregion
 
-        private async void OnConnectLister(string username)
+        private async Task OnConnectLister()
         {
-            // TODO: Verify how to get users
-            //users = await chatService.GetUsersAsync();
-            //userListView.SetSource(new ObservableCollection<string>(users));
+            users = await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers");
+            userListView.SetSource(new ObservableCollection<string>(users));
             Application.Refresh();
         }
 
-        private void OnDisconnectLister(string username)
+        private async Task OnDisconnectLister()
         {
-            users.Remove(username);
+            users = await signalRClient.connection.InvokeAsync<HashSet<string>>("ShowActiveUsers");
+            userListView.SetSource(new ObservableCollection<string>(users));
             Application.Refresh();
         }
 

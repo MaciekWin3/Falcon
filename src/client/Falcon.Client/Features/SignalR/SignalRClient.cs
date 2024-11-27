@@ -16,9 +16,9 @@ namespace Falcon.Client.Features.SignalR
 
         public event Action<string, string> OnReceiveMessage;
 
-        public event Action<string> OnConnected;
+        public event Func<Task> OnConnected;
 
-        public event Action<string> OnDisconnected;
+        public event Func<Task> OnDisconnected;
 
         private void CreateHub(string token)
         {
@@ -39,8 +39,8 @@ namespace Falcon.Client.Features.SignalR
                 .Build();
 
             connection.On<string, string>("ReceiveMessage", (userName, message) => OnReceiveMessage?.Invoke(userName, message));
-            connection.On<string>("OnConnected", (username) => OnConnected?.Invoke(username));
-            connection.On<string>("OnDisconnected", (username) => OnDisconnected?.Invoke(username));
+            connection.On<string>("OnConnected", (username) => OnConnected?.Invoke());
+            connection.On<string>("OnDisconnected", (username) => OnDisconnected?.Invoke());
         }
 
         public async Task StartConnectionAsync(string token)

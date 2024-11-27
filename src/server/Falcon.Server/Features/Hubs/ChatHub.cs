@@ -116,38 +116,37 @@ namespace Falcon.Server.Features.Hubs
         /// Retrieves a list of active chat rooms.
         /// </summary>
         [SignalRMethod("ShowActiveRooms")]
-        public List<string> ShowActiveRooms()
-        {
-            return Rooms.ToList();
-        }
+        public HashSet<string> ShowActiveRooms() => Rooms;
 
         /// <summary>
         /// Retrieves a list of users in the user's current chat room.
         /// </summary>
         [SignalRMethod("ShowUsersInRoom")]
-        public List<string> ShowUsersInRoom()
+        public HashSet<string> ShowUsersInRoom()
         {
             string room = GetUserGroup();
             var users = Connections.Values
                .Where(c => c.Room == room)
                .Select(c => c.Username)
-               .ToList();
+               .ToList()
+               .Distinct();
 
-            return users;
+            return new HashSet<string>(users);
         }
 
         /// <summary>
         /// Retrieves a list of active users.
         /// </summary>
         [SignalRMethod("ShowActiveUsers")]
-        public List<string> ShowActiveUsers()
+        public HashSet<string> ShowActiveUsers()
         {
             string room = GetUserGroup();
             var users = Connections.Values
                .Select(c => c.Username)
-               .ToList();
+               .ToList()
+               .Distinct();
 
-            return users;
+            return new HashSet<string>(users);
         }
 
         /// <summary>

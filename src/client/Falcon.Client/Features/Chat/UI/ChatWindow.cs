@@ -5,7 +5,7 @@ using Terminal.Gui;
 
 namespace Falcon.Client.Features.Chat.UI
 {
-    public class ChatWindow : Window
+    public sealed class ChatWindow : Window
     {
         const int CHAT_WINDOW_HEIGHT = 3;
 
@@ -30,8 +30,6 @@ namespace Falcon.Client.Features.Chat.UI
             this.signalRClient = signalRClient;
             this.chatService = chatService;
 
-            Application.Top.Add(CreateMenuBar());
-
             // Window
             X = 0;
             Y = 1;
@@ -44,7 +42,6 @@ namespace Falcon.Client.Features.Chat.UI
             this.signalRClient.OnReceiveMessage += AddMessageToChat;
             this.signalRClient.OnConnected += async () => await HandleConnectionStatusChangeAsync();
             this.signalRClient.OnDisconnected += async () => await HandleConnectionStatusChangeAsync();
-
 
             // Initialize data asynchronously
             _ = InitializeAsync();
@@ -202,18 +199,18 @@ namespace Falcon.Client.Features.Chat.UI
             // TODO: Add menu bar
             return new MenuBar
             {
-                Data = new MenuBarItem[]
-                {
+                Title = "TestMenuBar",
+                Menus =
+                [
                     new MenuBarItem("_App", new MenuItem[]
                     {
                         new MenuItem("_Quit", "", () => Application.RequestStop(), null, null)
                     })
-                }
+                ]
             };
         }
 
         #endregion
-
 
         private async Task HandleConnectionStatusChangeAsync()
         {

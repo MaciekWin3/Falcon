@@ -31,14 +31,24 @@ namespace Falcon.Client
         {
             Application.Init();
             Application.Run(CreateLoginWindow());
-            Application.Shutdown();
             Console.OutputEncoding = System.Text.Encoding.Default;
+            Application.Shutdown();
         }
 
-        public void ChangeWindow(Window window)
+        public void ChangeWindow(Window window, MenuBar menuBar = null)
         {
             Application.RequestStop();
-            Application.Run(window);
+            Toplevel appWindow = new()
+            {
+                Title = "Falcon"
+            };
+            appWindow.Add(window);
+
+            if (menuBar is not null)
+            {
+                appWindow.Add(menuBar);
+            }
+            Application.Run(appWindow);
         }
 
         private LoginWindow CreateLoginWindow()
@@ -53,7 +63,8 @@ namespace Falcon.Client
                     var room = "All";
                     await signalRClient.connection.InvokeCoreAsync("JoinRoomAsync", args: [room]);
                     var chatWindow = CreateChatWindow();
-                    ChangeWindow(chatWindow);
+                    var menuBar = chatWindow.CreateMenuBar();
+                    ChangeWindow(chatWindow, menuBar);
                 });
             };
 

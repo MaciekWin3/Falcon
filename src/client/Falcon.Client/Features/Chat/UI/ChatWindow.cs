@@ -128,7 +128,6 @@ namespace Falcon.Client.Features.Chat.UI
             chatFrameView.Add(chatListView);
             Add(chatFrameView);
 
-
             // Users
             var userListFrame = new FrameView
             {
@@ -191,7 +190,6 @@ namespace Falcon.Client.Features.Chat.UI
 
             chatBar.Add(chatMessagePromptView);
             Add(chatBar);
-            //Add(CreateMenuBar());
         }
 
         public MenuBar CreateMenuBar()

@@ -149,7 +149,7 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
     c.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
 
-    c.TagActionsBy(api => new[] { api.GroupName });
+    c.TagActionsBy(api => [api.GroupName]);
     c.EnableAnnotations();
 });
 

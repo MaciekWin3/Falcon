@@ -6,14 +6,9 @@ using Falcon.Client.Features.Chat.UI;
 using Falcon.Client.Features.Lobby.UI;
 using Falcon.Client.Features.SignalR;
 using Falcon.Client.Utils;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-
-var builder = new ConfigurationBuilder();
-BuildConfig(builder);
-var configuration = builder.Build();
 
 ConfigHelper.CreateConfig();
 var config = ConfigHelper.GetConfig();
@@ -34,7 +29,7 @@ var host = Host.CreateDefaultBuilder()
 
         services.AddHttpClient("Server", client =>
         {
-            client.BaseAddress = new Uri(configuration["ServerIp"]);
+            client.BaseAddress = new Uri(config.ConnectionString);
         });
 
         services.AddLogging(builder =>
@@ -51,10 +46,3 @@ var host = Host.CreateDefaultBuilder()
 
 var svc = ActivatorUtilities.CreateInstance<TerminalOrchestrator>(host.Services);
 svc.InitApp();
-
-void BuildConfig(IConfigurationBuilder builder)
-{
-    builder.SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-        .AddEnvironmentVariables();
-}

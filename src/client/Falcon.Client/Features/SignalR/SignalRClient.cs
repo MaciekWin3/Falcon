@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using Falcon.Client.Utils;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
@@ -15,14 +16,15 @@ namespace Falcon.Client.Features.SignalR
         }
 
         public event Action<string, string> OnReceiveMessage;
-
         public event Action OnConnected;
         public event Action OnDisconnected;
 
         private void CreateHub(string token)
         {
+            ConfigHelper.CreateConfig();
+            var config = ConfigHelper.GetConfig();
             connection = new HubConnectionBuilder()
-                .WithUrl($"{configuration["ServerIp"]}chathub?access_token=" + token, options =>
+                .WithUrl($"{config.ConnectionString}chathub?access_token=" + token, options =>
                 {
                     options.AccessTokenProvider = () =>
                     {
